@@ -1,0 +1,39 @@
+{
+  "name": "EPBOutage",
+  "version": "0.1.0",
+  "description": "A EPB Outage",
+  "main": "gulpfile.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Curtisdhi/EPBOutage.git"
+  },
+  "author": "Curtisdhi",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Curtisdhi/EPBOutage/issues"
+  },
+  "homepage": "https://github.com/Curtisdhi/EPBOutage",
+  "dependencies": {
+    "bower": "^1.7.9",
+    "del": "^2.2.0",
+    "gulp": "^3.9.1",
+    "gulp-autoprefixer": "^3.1.0",
+    "gulp-bower": "^0.0.13",
+    "gulp-clean-css": "^2.0.10",
+    "gulp-concat": "^2.6.0",
+    "gulp-concat-css": "^2.3.0",
+    "gulp-plumber": "^1.1.0",
+    "gulp-rename": "^1.2.2",
+    "gulp-sass": "^3.0.0",
+    "gulp-sourcemaps": "^1.9.1",
+    "gulp-strip-comments": "^2.4.3",
+    "gulp-strip-css-comments": "^1.2.0",
+    "gulp-uglify": "^1.5.3",
+    "gulp-util": "^3.0.7",
+    "gulp-watch": "^4.3.8",
+    "run-sequence": "^1.2.1"
+  }
+}

@@ -1,0 +1,26 @@
+{% set id = id|default('modal')%}
+{% set classes = classes|default('modal fade') %}
+{% block modal %}
+    <div id="{{ id }}" class="{{ classes  }}">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    {% block header %}
+                        <h5 class="modal-title">{% block title %}{% endblock %}</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    {% endblock %}
+                </div>
+                <div class="modal-body">
+                    {% block body %}{% endblock %}
+                </div>
+                <div class="modal-footer">
+                    {% block footer %}
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    {% endblock %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

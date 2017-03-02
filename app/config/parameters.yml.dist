@@ -1,0 +1,40 @@
+# This file is a "template" of what your parameters.yml file should look like
+# Set parameters here that may be different on each deployment target of the app, e.g. development, staging, production.
+# http://symfony.com/doc/current/best_practices/configuration.html#infrastructure-related-configuration
+parameters:
+    application_name: EPBOutage
+    site_name: epboutage.info
+    site_url: http://www.epboutage.info
+
+    database_driver:   pdo_mysql
+    database_host:     127.0.0.1
+    database_port:     ~
+    database_name:     symfony
+    database_user:     root
+    database_password: ~
+
+    mongo_database_name: epboutage
+    mongo_database_server: mongodb://localhost:27017
+
+    mongo.session.options:
+        database: "%mongo_database_name%"
+        collection: sessions
+
+    # You should uncomment this if you want use pdo_sqlite
+    # database_path: "%kernel.root_dir%/data.db3"
+
+    mailer_transport: smtp
+    mailer_host: smtp.mailgun.org
+    mailer_port: 587
+    mailer_sender: no-reply@epboutage.info
+    mailer_user: postmaster@epboutage.info
+    mailer_password: '27e3b22ef1ca0811afcd2beb054d3ee0'
+    mailer_encryption: tls
+    mailer_recevier: demo@demo.com
+    locale: en
+    # en: en
+    recaptcha_public_key: 6Lf12xEUAAAAAEvfkj8iFiazZ5FmRTdkthAb937V
+    recaptcha_private_key: 6Lf12xEUAAAAAEYPPW-9Lz9sDVRZZBOEO-ERHW9_
+
+    # A secret key that's used to generate certain security-related tokens
+    secret:            ThisTokenIsNotSoSecretChangeIt
