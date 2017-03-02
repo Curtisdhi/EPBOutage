@@ -38,3 +38,4 @@ parameters:
 
     # A secret key that's used to generate certain security-related tokens
     secret:            ThisTokenIsNotSoSecretChangeIt
+    epb_api_url: https://epb.com/api/v3/outages
