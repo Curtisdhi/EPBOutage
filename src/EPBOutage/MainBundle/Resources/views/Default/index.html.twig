@@ -1,5 +1,20 @@
 {% extends '::layout.html.twig' %}
 
+{% block javascript %}
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key={{ google_api_key }}&callback=initMap"></script>
+    <script>
+        var mapReady = true;
+        function initMap() {
+            
+        }
+        $(document).ready(function () {
+            var map = $('#map');
+            var outageMap = new OutageMap(map, map.data('zoom'), map.data('center-location'));
+            outageMap.load();
+        });
+    </script>
+{% endblock %}
+
 {% block content %}
     <!-- Main jumbotron for a primary marketing message or call to action -->
     <div class="jumbotron jumbotron-fluid">
@@ -9,6 +24,7 @@
             <p class="lead">
                 <a class="btn btn-primary btn-lg" href="#" role="button">Learn more</a>
             </p>
+            <div id="map" data-zoom="{{ google_map.zoom }}" data-center-location="{{ google_map.center_location|json_encode() }}"></div>
         </div>
     </div>
 {% endblock %}

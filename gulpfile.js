@@ -130,11 +130,11 @@ gulp.task('build:css:vendors', function() {
 // // /////////////////////////////////////////////
 
 gulp.task('watch', function() {
-    gulp.watch(['assets/core/js/*.js', 'assets/core/js/**/*.js'], function(cb) {
-        runSequence(['build:js:core'], ['deploy:build'], cb);
+    gulp.watch(['assets/core/js/*.js', 'assets/core/js/**/*.js'], function() {
+        runSequence(['build:js:core'], ['deploy:build']);
     });
-    gulp.watch(['assets/core/css/*.css', 'assets/core/scss/**/*.scss'], function(cb) {
-        runSequence(['build:scss:core'], ['deploy:build'], cb);
+    gulp.watch(['assets/core/css/*.css', 'assets/core/scss/**/*.scss'], function() {
+        runSequence(['build:scss:core'], ['deploy:build']);
     });
 });
 
