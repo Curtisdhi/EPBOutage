@@ -74,7 +74,7 @@ gulp.task('build:js:core', function() {
 gulp.task('build:js:vendors', function() {
     //don't use min version for dev (helps during debugging)
     return gulp.src(['assets/vendors/jquery/dist/jquery.js',
-        'assets/vendors/lodash/dist/lodash.js',
+        'assets/vendors/lodash/lodash.js',
         'assets/vendors/tether/dist/js/tether.js',
         'assets/vendors/bootstrap/dist/js/bootstrap.js',
         'assets/vendors/bootstrap-toggle/js/bootstrap-toggle.js'

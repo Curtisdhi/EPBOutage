@@ -5,7 +5,7 @@ namespace EPBOutage\MainBundle\Document;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as Mongo;
 
 /** @Mongo\EmbeddedDocument */
-class Metrics
+class Metrics implements \JsonSerializable
 {
    
     /** @Mongo\Field(type="integer") */
@@ -96,5 +96,16 @@ class Metrics
         return $this;
     }
 
+    public function jsonSerialize() {
+        return array(
+            'autoRestoredOutages' => $this->getAutoRestoredOutages(),
+            'currentOutages' => $this->getCurrentOutages(),
+            'durationOutages' => $this->getDurationOutages(),
+            'preventedOutages' => $this->getPreventedOutages(),
+            'totalSmartGridActivity' => $this->getTotalSmartGridActivity(),
+            'beginDtTm' => $this->getBeginDtTm(),
+            'endDtTm' => $this->getEndDtTm(),
+        );
+    }
 
 }

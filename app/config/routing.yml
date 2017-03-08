@@ -1,5 +1,6 @@
 epboutage_main:
-    resource: "@EPBOutageMainBundle/Resources/config/routing.yml"
+    resource: "@EPBOutageMainBundle/Controller"
+    type:     annotation
     prefix:   /
 
 fos_js_routing:

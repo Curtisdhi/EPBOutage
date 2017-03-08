@@ -4,13 +4,24 @@
     <script async defer src="https://maps.googleapis.com/maps/api/js?key={{ google_api_key }}&callback=initMap"></script>
     <script>
         var mapReady = true;
+        var mapLoaded = false;
+        var outageMap = null;
         function initMap() {
-            
+            loadMap();
         }
+ 
+        function loadMap() {
+            if (!mapLoaded && outageMap) {
+                outageMap.load();
+                outageMap.loadOutageData();
+                mapLoaded = true;
+            }
+        }
+        
         $(document).ready(function () {
             var map = $('#map');
-            var outageMap = new OutageMap(map, map.data('zoom'), map.data('center-location'));
-            outageMap.load();
+            outageMap = new OutageMap(map, map.data('zoom'), map.data('center-location'));
+            loadMap();
         });
     </script>
 {% endblock %}

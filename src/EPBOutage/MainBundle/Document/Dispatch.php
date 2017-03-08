@@ -5,7 +5,7 @@ namespace EPBOutage\MainBundle\Document;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as Mongo;
 
 /** @Mongo\EmbeddedDocument */
-class Dispatch
+class Dispatch implements \JsonSerializable
 {
     /** @Mongo\Field(type="integer") */
     protected $id;     
@@ -82,5 +82,16 @@ class Dispatch
         $this->longitude = $longitude;
         return $this;
     }
-    
+
+    public function jsonSerialize() {
+        return array(
+            'id' => $this->getId(),
+            'crewQty' => $this->getCrewQty(),
+            'customerQty' => $this->getCustomerQty(),
+            'jobStatus' => $this->getJobStatus(),
+            'latitude' => $this->getLatitude(),
+            'longitude' => $this->getLongitude(),
+        );
+    }
+
 }

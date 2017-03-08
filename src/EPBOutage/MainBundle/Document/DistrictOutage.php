@@ -5,7 +5,7 @@ namespace EPBOutage\MainBundle\Document;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as Mongo;
 
 /** @Mongo\EmbeddedDocument */
-class DistrictOutage
+class DistrictOutage implements \JsonSerializable
 {
     /** @Mongo\Field(type="string") */
     protected $name;
@@ -15,12 +15,6 @@ class DistrictOutage
     
     /** @Mongo\Field(type="integer") */
     protected $customersAffected;
-    
-    /** @Mongo\Field(type="collection") */
-    protected $latitudes = array();
-    
-    /** @Mongo\Field(type="collection") */
-    protected $longitudes = array();
     
     public function __construct() {
         
@@ -38,14 +32,6 @@ class DistrictOutage
         return $this->customersAffected;
     }
 
-    public function getLatitudes() {
-        return $this->latitudes;
-    }
-
-    public function getLongitudes() {
-        return $this->longitudes;
-    }
-
     public function setName($name) {
         $this->name = $name;
         return $this;
@@ -61,25 +47,12 @@ class DistrictOutage
         return $this;
     }
 
-    public function setLatitudes($latitudes) {
-        $this->latitudes = $latitudes;
-        return $this;
+    public function jsonSerialize() {
+        return array(
+            'name' => $this->getName(),
+            'incidents' => $this->getIncidents(),
+            'customersAffected' => $this->getCustomersAffected(),
+        );
     }
-
-    public function setLongitudes($longitudes) {
-        $this->longitudes = $longitudes;
-        return $this;
-    }
-    
-    public function addLatitude($latitude) {
-        $this->latitudes[] = $latitude;
-        return $this;
-    }
-    
-    public function addLongitude($longitude) {
-        $this->longitudes[] = $longitude;
-        return $this;
-    }
-
 
 }

@@ -16,7 +16,9 @@ class OutageImporter {
     public function importFromJsonString($outageJsonString) {
         $json = json_decode($outageJsonString, true);
         $outage = new Document\Outage();
-        $outage->setDistrictOutages($this->createDistrictOutages($json['districtOutages']));
+        $m = $this->createDistrictOutages($json['districtOutages']);
+        $outage->setDistrictOutages($m['districtOutages']);
+        $outage->setBoundaries($m['boundaries']);
         $outage->setMetrics($this->createMetrics($json['metrics']));
         $outage->setDispatches($this->createDispatches($json['outages']));
         $outage->setFullJson($outageJsonString);
@@ -26,21 +28,27 @@ class OutageImporter {
     }
     
     public function createDistrictOutages($districtOutages) {
+        $docDistrictOutages = array();
         $docBoundaries = array();
         foreach ($districtOutages as $districtOutage) {
-            $b = new Document\DistrictOutage();
-            foreach ($districtOutage['boundaries'] as $bound) {
-                $b->addLongitude($this->getVal('longitude', $bound));
-                $b->addLatitude($this->getVal('longitude', $bound));
-            }
+            $d = new Document\DistrictOutage();
+            $b = new Document\Boundary();
             $b->setName($this->getVal('name', $districtOutage));
-            $b->setIncidents($this->getVal('incidents', $districtOutage));
-            $b->setCustomersAffected($this->getVal('customersAffected', $districtOutage));
+            foreach ($districtOutage['boundaries'] as $bound) {
+                $b->addLatLng(array(
+                    'lng' => $this->getVal('longitude', $bound),
+                    'lat' => $this->getVal('latitude', $bound)));
+            }
+            
+            $d->setName($this->getVal('name', $districtOutage));
+            $d->setIncidents($this->getVal('incidents', $districtOutage));
+            $d->setCustomersAffected($this->getVal('customersAffected', $districtOutage));
             
             $docBoundaries[] = $b;
+            $docDistrictOutages[] = $d;
         }
         
-        return $docBoundaries;
+        return array('districtOutages' => $docDistrictOutages, 'boundaries' => $docBoundaries);
     }
     
     public function createMetrics($metrics) {
