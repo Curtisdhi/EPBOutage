@@ -23,6 +23,32 @@
             var metricsTableElement = $('#metrics-table > tbody');
             outageMap = new OutageMap(map, metricsTableElement, map.data('zoom'), map.data('center-location'));
             loadMap();
+            
+            var mySlider = $("input[name='outage-picker']");
+            var latestOutages = mySlider.data('latest-outages');
+            
+            var ticks = [];
+            var ticksLabels = [];
+            
+            var tick = 0;
+            _.each(latestOutages, function(v) {
+                ticks.push(++tick);
+                console.log(new Date(v.updatedOn.sec*1000))
+                var date = new Date(v.updatedOn.sec*1000); 
+                ticksLabels.push(date.toISOString());
+            });
+            
+            mySlider.slider({
+                min: 1,
+                max: latestOutages.length,
+                step: 1,
+                value: latestOutages.length,
+                ticks: ticks,
+                ticks_labels: ticksLabels
+            });
+            
+            
+
         });
     </script>
 {% endblock %}
@@ -30,6 +56,7 @@
 {% block content %}
     <div class="row">
         <div class="col-md-10">
+            <input type="text" name="outage-picker" data-latest-outages="{{ latestOutages|json_encode() }}" data-provide="slider" data-slider-tooltip="hide">
             <div id="map" data-zoom="{{ google_map.zoom }}" data-center-location="{{ google_map.center_location|json_encode() }}"></div>
         </div>
         <div class="col-md-2">

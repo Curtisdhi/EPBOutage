@@ -77,7 +77,8 @@ gulp.task('build:js:vendors', function() {
         'assets/vendors/lodash/lodash.js',
         'assets/vendors/tether/dist/js/tether.js',
         'assets/vendors/bootstrap/dist/js/bootstrap.js',
-        'assets/vendors/bootstrap-toggle/js/bootstrap-toggle.js'
+        'assets/vendors/bootstrap-toggle/js/bootstrap-toggle.js',
+        'assets/vendors/seiyria-bootstrap-slider/dist/bootstrap-slider.js'
         ])
         .pipe(plumber())
         .pipe(concat('vendor.min.js'))
@@ -113,7 +114,8 @@ gulp.task('build:css:vendors', function() {
             'assets/vendors/font-awesome/css/font-awesome.css',
             'assets/vendors/bootstrap-toggle/css/bootstrap-toggle.css',
             'assets/vendors/animate.css/animate.css',
-            'assets/vendors/awesome-bootstrap-checkbox/awesome-bootstrap-checkbox.css'
+            'assets/vendors/awesome-bootstrap-checkbox/awesome-bootstrap-checkbox.css',
+            'assets/vendors/seiyria-bootstrap-slider/dist/css/bootstrap-slider.css',
         ])
         .pipe(plumber())
         .pipe(concatCss("vendor.min.css", {rebaseUrls: false}))

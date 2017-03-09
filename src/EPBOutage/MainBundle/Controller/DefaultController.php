@@ -18,7 +18,11 @@ class DefaultController extends Controller
      */
     public function indexAction()
     {
-        return;
+        $repo = $this->get('doctrine_mongodb')
+            ->getRepository('EPBOutageMainBundle:Outage');
+        $latestOutages = $repo->findLatestWithIdAndUpdatedDate(2);
+        
+        return array('latestOutages' => $latestOutages);
     }
     
     /**
