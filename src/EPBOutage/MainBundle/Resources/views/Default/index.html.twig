@@ -20,19 +20,23 @@
         
         $(document).ready(function () {
             var map = $('#map');
-            outageMap = new OutageMap(map, map.data('zoom'), map.data('center-location'));
+            var metricsTableElement = $('#metrics-table > tbody');
+            outageMap = new OutageMap(map, metricsTableElement, map.data('zoom'), map.data('center-location'));
             loadMap();
         });
     </script>
 {% endblock %}
 
 {% block content %}
-    <!-- Main jumbotron for a primary marketing message or call to action -->
-    <div class="jumbotron jumbotron-fluid">
-        <div class="container">
-            <h1 class="display-3">EPBOutage</h1>
-            <p class="lead">A EPB outage viewer</p>
+    <div class="row">
+        <div class="col-md-10">
             <div id="map" data-zoom="{{ google_map.zoom }}" data-center-location="{{ google_map.center_location|json_encode() }}"></div>
+        </div>
+        <div class="col-md-2">
+            <h3>Metrics</h3>
+            <table id="metrics-table" class="table table-striped">
+                <tbody></tbody>
+            </table>
         </div>
     </div>
 {% endblock %}

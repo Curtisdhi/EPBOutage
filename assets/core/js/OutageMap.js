@@ -1,4 +1,4 @@
-function OutageMap(mapElement, zoom, centerLocation) {
+function OutageMap(mapElement,metricsTableElement, zoom, centerLocation) {
     this.mapElement = mapElement;
     this.zoom = zoom;
     this.centerLocation = centerLocation;
@@ -7,6 +7,7 @@ function OutageMap(mapElement, zoom, centerLocation) {
     this.map = null;
     this.data = null;
     this.infowindows = [];
+    this.metricsTableElement = metricsTableElement;
 }
 
 OutageMap.prototype = {
@@ -48,6 +49,8 @@ OutageMap.prototype = {
             var center = {lat: parseFloat(v.latitude), lng: parseFloat(v.longitude)};
             _self.drawDispatchesOutages(v, center, '#FF0000', 0.5, 1, v.customerQty);
         });
+        
+        _self.displayMetrics(data);
     },
     
     drawBoundary: function(boundary, districtOutage, paths, color, opacity, strokeWeight) {
@@ -113,18 +116,49 @@ OutageMap.prototype = {
         var timeout = null;
         
         object.addListener('mouseover', function () {
-            _.each(_self.infowindows, function(v) {
-                v.close();
-            });
-            infoWindow.open(_self.map, object);
-            infoWindow.setPosition(position);
             if (!_.isNull(timeout)) {
                 clearTimeout(timeout);
             }
+            timeout = setTimeout(function() {
+                _.each(_self.infowindows, function(v) {
+                    v.close();
+                });
+                infoWindow.open(_self.map, object);
+                infoWindow.setPosition(position);
+            }, 500);
+            
         });
         
         //add infowindows to the global space for management
         _self.infowindows.push(infoWindow);
 
+    },
+    
+    displayMetrics: function(data) {
+        var _self = this;
+        _self.metricsTableElement.empty();
+        _self.displayMetric('Current Outages', data.metrics.currentOutages);
+        //figure out what this value represents
+        //_self.displayMetric('Duration of Outages', data.metrics.durationOutages);
+        _self.displayMetric('Auto restored Outages', data.metrics.autoRestoredOutages);
+        _self.displayMetric('Prevented Outages', data.metrics.preventedOutages);
+        _self.displayMetric('Total smart grid activity', data.metrics.totalSmartGridActivity);
+        
+        var customersAffected = 0;
+        var crewDispatched = 0;
+        _.each(data.dispatches, function(v) {
+            customersAffected += v.customerQty;
+            crewDispatched += v.crewQty;
+        });
+        _self.displayMetric('Customers Affected', customersAffected);
+        _self.displayMetric('Crew Dispatched', crewDispatched);
+        
+        
+        
+    },
+    
+    displayMetric: function(label, value) {
+        var _self = this;
+        _self.metricsTableElement.append('<tr><th>'+ label +'</th><td>'+ value +'</td></tr>');
     }
 };
