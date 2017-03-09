@@ -6,7 +6,7 @@ function OutageMap(mapElement, zoom, centerLocation) {
     this.centerLocation.lng = parseFloat(this.centerLocation.lng);
     this.map = null;
     this.data = null;
-    
+    this.infowindows = [];
 }
 
 OutageMap.prototype = {
@@ -41,15 +41,16 @@ OutageMap.prototype = {
         var _self = this;
         _self.data = data;
         _.each(data.boundaries, function(v) {
-            _self.drawBoundary(v.name, v.latLng, '#3494d3', 0.2, 1);
+            var districtOutage = _.find(data.districtOutages, function(o) { return v.name === o.name });
+            var boundary = _self.drawBoundary(v, districtOutage, v.latLng, '#3494d3', 0.2, 1);
         });
         _.each(data.dispatches, function(v) {
             var center = {lat: parseFloat(v.latitude), lng: parseFloat(v.longitude)};
-            _self.drawDispatchesOutages(center, '#FF0000', 0.5, 1, v.customerQty);
+            _self.drawDispatchesOutages(v, center, '#FF0000', 0.5, 1, v.customerQty);
         });
     },
     
-    drawBoundary: function(name, paths, color, opacity, strokeWeight) {
+    drawBoundary: function(boundary, districtOutage, paths, color, opacity, strokeWeight) {
         var _self = this;
         var polygon = new google.maps.Polygon({
           paths: paths,
@@ -60,9 +61,28 @@ OutageMap.prototype = {
           fillOpacity: opacity,
           map: _self.map
         });
+        
+        if (!_.isUndefined(districtOutage)) {
+            var content = "<h5>"+ boundary.name +"</h5><div>";
+            if (districtOutage.incidents) {
+                content += "<div><label>Incidents:</label> "+ districtOutage.incidents +"</div>";
+            }
+            if (districtOutage.customersAffected) {
+                content += "<div><label>Customers affected</label> "+ districtOutage.customersAffected +"</div>";
+            }
+            
+            var bounds = new google.maps.LatLngBounds();
+            _.each(paths, function(v) {
+                bounds.extend(v);
+            });
+
+            _self.addInfowindow(polygon, content, bounds.getCenter());
+        }
+        
+        return polygon;
     },
     
-    drawDispatchesOutages: function(center, color, opacity, strokeWeight, numberOfOutages) {
+    drawDispatchesOutages: function(dispatch, center, color, opacity, strokeWeight, numberOfOutages) {
         var _self = this;
         if (numberOfOutages < 10) { numberOfOutages = 10; }
         var radius = Math.sqrt(numberOfOutages) * 100;
@@ -76,5 +96,35 @@ OutageMap.prototype = {
             center: center,
             radius: radius
           });
+          
+        var content = "<h5>Outage Info</h5><div><label>Job Status:</label> "+ dispatch.jobStatus +"</div>"+
+                "<div><label>Crew dispatched:</label> "+ dispatch.crewQty +"</div>"+
+                "<div><label>Customers affected</label> "+ dispatch.customerQty +"</div>";
+
+        _self.addInfowindow(circle, content, circle.getCenter());
+        return circle;
+    },
+    
+    addInfowindow: function(object, content, position) {
+        var _self = this;
+        var infoWindow = new google.maps.InfoWindow({
+            content: content
+        });
+        var timeout = null;
+        
+        object.addListener('mouseover', function () {
+            _.each(_self.infowindows, function(v) {
+                v.close();
+            });
+            infoWindow.open(_self.map, object);
+            infoWindow.setPosition(position);
+            if (!_.isNull(timeout)) {
+                clearTimeout(timeout);
+            }
+        });
+        
+        //add infowindows to the global space for management
+        _self.infowindows.push(infoWindow);
+
     }
 };
