@@ -43,6 +43,10 @@ OutageMap.prototype = {
         _.each(data.boundaries, function(v) {
             _self.drawBoundary(v.name, v.latLng, '#3494d3', 0.2, 1);
         });
+        _.each(data.dispatches, function(v) {
+            var center = {lat: parseFloat(v.latitude), lng: parseFloat(v.longitude)};
+            _self.drawDispatchesOutages(center, '#FF0000', 0.5, 1, v.customerQty);
+        });
     },
     
     drawBoundary: function(name, paths, color, opacity, strokeWeight) {
@@ -53,8 +57,24 @@ OutageMap.prototype = {
           strokeOpacity: 1,
           strokeWeight: strokeWeight,
           fillColor: color,
-          fillOpacity: opacity
+          fillOpacity: opacity,
+          map: _self.map
         });
-       polygon.setMap(_self.map);
+    },
+    
+    drawDispatchesOutages: function(center, color, opacity, strokeWeight, numberOfOutages) {
+        var _self = this;
+        if (numberOfOutages < 10) { numberOfOutages = 10; }
+        var radius = Math.sqrt(numberOfOutages) * 100;
+        var circle = new google.maps.Circle({
+            strokeColor: EPBOutage.darkenHexColor(color),
+            strokeOpacity: 1,
+            strokeWeight: strokeWeight,
+            fillColor: color,
+            fillOpacity: opacity,
+            map: _self.map,
+            center: center,
+            radius: radius
+          });
     }
 };
