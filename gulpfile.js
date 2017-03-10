@@ -78,7 +78,8 @@ gulp.task('build:js:vendors', function() {
         'assets/vendors/tether/dist/js/tether.js',
         'assets/vendors/bootstrap/dist/js/bootstrap.js',
         'assets/vendors/bootstrap-toggle/js/bootstrap-toggle.js',
-        'assets/vendors/seiyria-bootstrap-slider/dist/bootstrap-slider.js'
+        'assets/vendors/seiyria-bootstrap-slider/dist/bootstrap-slider.js',
+        'assets/vendors/js-map-label/src/maplabel.js'
         ])
         .pipe(plumber())
         .pipe(concat('vendor.min.js'))

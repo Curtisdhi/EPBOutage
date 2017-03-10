@@ -25,6 +25,15 @@ class DefaultController extends Controller
         return array('latestOutages' => $latestOutages);
     }
     
+     /**
+     * @Route("/about", name="about")
+     * @Template()
+     */
+    public function aboutAction()
+    {
+        return;
+    }
+    
     /**
      * @Route("/ajax/fetch_current_outage", name="ajax_fetch_current_outage", options={"expose":true})
      */

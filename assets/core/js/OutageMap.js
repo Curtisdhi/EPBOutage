@@ -95,8 +95,16 @@ OutageMap.prototype = {
             _.each(paths, function(v) {
                 bounds.extend(v);
             });
-
-            _self.addInfowindow(polygon, content, bounds.getCenter());
+            
+            var mapLabel = new MapLabel({
+                text: boundary.name,
+                position: bounds.getCenter(),
+                map: _self.map,
+                fontSize: 12,
+                align: 'right'
+            });
+            
+            _self.overlays.push(mapLabel);
         }
         
         return polygon;

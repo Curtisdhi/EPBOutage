@@ -1,29 +1,18 @@
 {% extends '::layout.html.twig' %}
+{% block primary_javascript %}
+    <script src="https://maps.googleapis.com/maps/api/js?key={{ google_api_key }}"></script>
+    {{ parent() }}
+{% endblock %}
 
 {% block javascript %}
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key={{ google_api_key }}&callback=initMap"></script>
-    <script>
-        var mapReady = true;
-        var mapLoaded = false;
-        var outageMap = null;
-        function initMap() {
-            loadMap();
-        }
- 
-        function loadMap() {
-            if (!mapLoaded && outageMap) {
-                outageMap.load();
-                outageMap.loadOutageData();
-                mapLoaded = true;
-            }
-        }
-        
+    <script>        
         $(document).ready(function () {
             var map = $('#map');
             var metricsTableElement = $('#metrics-accordion');
             outageMap = new OutageMap(map, metricsTableElement, map.data('zoom'), map.data('center-location'));
-            loadMap();
-            
+            outageMap.load();
+            outageMap.loadOutageData();
+                
             var mySlider = $("input[name='outage-picker']");
             var latestOutages = mySlider.data('latest-outages');
             
@@ -44,9 +33,9 @@
             
             mySlider.slider({
                 min: 1,
-                max: latestOutages.length,
+                max: ticks.length,
                 step: 1,
-                value: latestOutages.length,
+                value: ticks.length,
                 ticks: ticks,
                 ticks_labels: ticksLabels,
                 ticks_tooltip: true
