@@ -1,4 +1,4 @@
-function OutageMap(mapElement,metricsTableElement, zoom, centerLocation) {
+function OutageMap(mapElement,metricsElement, zoom, centerLocation) {
     this.mapElement = mapElement;
     this.zoom = zoom;
     this.centerLocation = centerLocation;
@@ -7,7 +7,10 @@ function OutageMap(mapElement,metricsTableElement, zoom, centerLocation) {
     this.map = null;
     this.data = null;
     this.infowindows = [];
-    this.metricsTableElement = metricsTableElement;
+    this.metricsElement = metricsElement;
+    this.metricsTemplate = metricsElement.find('.metric-template').clone();
+    this.overlays = [];
+    this.metricsTemplate.removeClass('metric-template hide');
 }
 
 OutageMap.prototype = {
@@ -29,12 +32,26 @@ OutageMap.prototype = {
         
     },
     
-    loadOutageData: function(url) {
+    loadOutageData: function(id) {
         var _self = this;
-        $.post(Routing.generate('ajax_fetch_current_outage'))
-            .done(function(data) {
-                   _self.drawData(data);
-            });
+        _self.clearOverlays();
+        var route = null;
+        if (_.isUndefined((id))) {
+            route = Routing.generate('ajax_fetch_current_outage');
+        } else {
+            route = Routing.generate('ajax_fetch_outage', {id: id});
+        }
+        $.post(route).done(function(data) {
+            _self.drawData(data);
+        });
+    },
+    
+    clearOverlays: function() {
+        var _self = this;
+        _.each(_self.overlays, function(v)  {
+            v.setMap(null);
+        });
+        _self.overlays = [];
     },
     
     
@@ -43,11 +60,11 @@ OutageMap.prototype = {
         _self.data = data;
         _.each(data.boundaries, function(v) {
             var districtOutage = _.find(data.districtOutages, function(o) { return v.name === o.name });
-            var boundary = _self.drawBoundary(v, districtOutage, v.latLng, '#3494d3', 0.2, 1);
+            _self.overlays.push(_self.drawBoundary(v, districtOutage, v.latLng, '#3494d3', 0.2, 1));
         });
         _.each(data.dispatches, function(v) {
             var center = {lat: parseFloat(v.latitude), lng: parseFloat(v.longitude)};
-            _self.drawDispatchesOutages(v, center, '#FF0000', 0.5, 1, v.customerQty);
+            _self.overlays.push(_self.drawDispatchesOutages(v, center, '#FF0000', 0.5, 1, v.customerQty));
         });
         
         _self.displayMetrics(data);
@@ -113,13 +130,17 @@ OutageMap.prototype = {
         var infoWindow = new google.maps.InfoWindow({
             content: content
         });
-        var timeout = null;
+        var openTimeout = null;
+        var closeTimeout = null;
         
         object.addListener('mouseover', function () {
-            if (!_.isNull(timeout)) {
-                clearTimeout(timeout);
+            if (!_.isNull(openTimeout)) {
+                clearTimeout(openTimeout);
             }
-            timeout = setTimeout(function() {
+            if (!_.isNull(closeTimeout)) {
+                clearTimeout(closeTimeout);
+            }
+            openTimeout = setTimeout(function() {
                 _.each(_self.infowindows, function(v) {
                     v.close();
                 });
@@ -129,6 +150,15 @@ OutageMap.prototype = {
             
         });
         
+        object.addListener('mouseout', function() {
+            if (!_.isNull(closeTimeout)) {
+                clearTimeout(closeTimeout);
+            }
+            closeTimeout = setTimeout(function() { 
+                infoWindow.close();
+            }, 1000);
+        });
+        
         //add infowindows to the global space for management
         _self.infowindows.push(infoWindow);
 
@@ -136,13 +166,18 @@ OutageMap.prototype = {
     
     displayMetrics: function(data) {
         var _self = this;
-        _self.metricsTableElement.empty();
-        _self.displayMetric('Current Outages', data.metrics.currentOutages);
+        var groupEl = null;
+        _self.metricsElement.empty();
+        
+        groupEl = _self.createAccordionGroup('Global');
+        groupEl.find('.metric-body').addClass('show');
+        
+        _self.addMetricToAccordionGroup(groupEl, 'Current Outages', data.metrics.currentOutages);
         //figure out what this value represents
         //_self.displayMetric('Duration of Outages', data.metrics.durationOutages);
-        _self.displayMetric('Auto restored Outages', data.metrics.autoRestoredOutages);
-        _self.displayMetric('Prevented Outages', data.metrics.preventedOutages);
-        _self.displayMetric('Total smart grid activity', data.metrics.totalSmartGridActivity);
+        _self.addMetricToAccordionGroup(groupEl, 'Auto restored Outages', data.metrics.autoRestoredOutages);
+        _self.addMetricToAccordionGroup(groupEl, 'Prevented Outages', data.metrics.preventedOutages);
+        _self.addMetricToAccordionGroup(groupEl, 'Total smart grid activity', data.metrics.totalSmartGridActivity);
         
         var customersAffected = 0;
         var crewDispatched = 0;
@@ -150,15 +185,43 @@ OutageMap.prototype = {
             customersAffected += v.customerQty;
             crewDispatched += v.crewQty;
         });
-        _self.displayMetric('Customers Affected', customersAffected);
-        _self.displayMetric('Crew Dispatched', crewDispatched);
+        _self.addMetricToAccordionGroup(groupEl, 'Customers Affected', customersAffected);
+        _self.addMetricToAccordionGroup(groupEl, 'Crew Dispatched', crewDispatched);
         
+        var districtOutages = _.sortBy(data.districtOutages, 'name');
+        _.each(districtOutages, function(v) {
+            var disable = true;
+            groupEl = _self.createAccordionGroup(v.name);
+            if (v.incidents) {
+                _self.addMetricToAccordionGroup(groupEl, 'Incidents', v.incidents);
+                disable = false;
+            }
+            if (v.customersAffected) {
+                _self.addMetricToAccordionGroup(groupEl, 'Customers Affected', v.customersAffected);
+                disable = false;
+            }
+            if (disable) {
+                groupEl.find('.metric-title').attr('href', '').addClass('disabled');
+            }
+        });
         
         
     },
     
-    displayMetric: function(label, value) {
+    createAccordionGroup: function(title) {
         var _self = this;
-        _self.metricsTableElement.append('<tr><th>'+ label +'</th><td>'+ value +'</td></tr>');
+        var el = _self.metricsTemplate.clone();
+        var id = 't' +(title +'_'+ (Math.floor(Math.random() * 10000))).hashCode();
+        
+        el.find('.metric-title').attr('href', '#'+id).text(title);
+        el.find('.metric-body').attr('id', id);
+        _self.metricsElement.append(el);
+        
+        return el;
+    },
+    
+    addMetricToAccordionGroup: function(groupEl, label, value) {
+        var _self = this;
+        groupEl.find('table > tbody').append('<tr><th>'+ label +'</th><td>'+ value +'</td></tr>');
     }
 };

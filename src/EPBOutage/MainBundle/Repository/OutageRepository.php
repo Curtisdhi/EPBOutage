@@ -16,7 +16,7 @@ class OutageRepository extends DocumentRepository {
     public function findLatestWithIdAndUpdatedDate($limit = 1) {
         $qb = $this->dm->createQueryBuilder('EPBOutageMainBundle:Outage')
             ->select('updatedOn')
-            ->sort('updatedOn', 'desc')
+            ->sort('updatedOn', 'asc')
             ->limit($limit);
         return $qb->hydrate(false)->getQuery()->execute()->toArray();
     }

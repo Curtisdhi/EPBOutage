@@ -20,7 +20,7 @@ class DefaultController extends Controller
     {
         $repo = $this->get('doctrine_mongodb')
             ->getRepository('EPBOutageMainBundle:Outage');
-        $latestOutages = $repo->findLatestWithIdAndUpdatedDate(2);
+        $latestOutages = $repo->findLatestWithIdAndUpdatedDate(10);
         
         return array('latestOutages' => $latestOutages);
     }
@@ -35,5 +35,17 @@ class DefaultController extends Controller
         $currentOutage = $repo->findCurrentOutage();
         
         return new JsonResponse($currentOutage);
+    }
+    
+    /**
+     * @Route("/ajax/fetch_outage/{id}", name="ajax_fetch_outage", options={"expose":true})
+     */
+    public function ajaxFetchOutageData($id) {
+        $repo = $this->get('doctrine_mongodb')
+            ->getRepository('EPBOutageMainBundle:Outage');
+        
+        $outage = $repo->find($id);
+        
+        return new JsonResponse($outage);
     }
 }

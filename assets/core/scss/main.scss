@@ -18,5 +18,24 @@ body {
 
 #map {
     width: 100%;
-    min-height: 500px;
+    height: 75vh;
+}
+
+.slider {
+    margin-left: 5%;
+    width: 90% !important;
+}
+
+#metrics-accordion {
+    .metric-body {
+        .card-block {
+            margin: 0;
+            padding: 0;
+        }
+    }
+    
+    .metric-title.disabled {
+        color: #000;
+        text-decoration: none;
+    }
 }

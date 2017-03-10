@@ -20,7 +20,7 @@
         
         $(document).ready(function () {
             var map = $('#map');
-            var metricsTableElement = $('#metrics-table > tbody');
+            var metricsTableElement = $('#metrics-accordion');
             outageMap = new OutageMap(map, metricsTableElement, map.data('zoom'), map.data('center-location'));
             loadMap();
             
@@ -33,9 +33,13 @@
             var tick = 0;
             _.each(latestOutages, function(v) {
                 ticks.push(++tick);
-                console.log(new Date(v.updatedOn.sec*1000))
-                var date = new Date(v.updatedOn.sec*1000); 
-                ticksLabels.push(date.toISOString());
+                var m = new Date(v.updatedOn.sec*1000); 
+                var dateStr = m.getUTCFullYear() + "/" +
+                    ("0" + (m.getUTCMonth()+1)).slice(-2) + "/" +
+                    ("0" + m.getUTCDate()).slice(-2) + " " +
+                    ("0" + m.getUTCHours()).slice(-2) + ":" +
+                    ("0" + m.getUTCMinutes()).slice(-2);
+                ticksLabels.push(dateStr);
             });
             
             mySlider.slider({
@@ -44,9 +48,27 @@
                 step: 1,
                 value: latestOutages.length,
                 ticks: ticks,
-                ticks_labels: ticksLabels
+                ticks_labels: ticksLabels,
+                ticks_tooltip: true
+            }).change(function() {
+                var id = getIdFromOutagesByIndex(parseInt($(this).val()));
+                if (id) {
+                    outageMap.loadOutageData(id);
+                }
             });
             
+            function getIdFromOutagesByIndex(index) {
+                var i = 1;
+                var o = null;
+                _.each(latestOutages, function(v) {
+                    if (i === index) {
+                        o = v;
+                        return false;
+                    }
+                    i++;
+                });
+                return o ? o._id.$id : null;
+            }
             
 
         });
@@ -56,14 +78,30 @@
 {% block content %}
     <div class="row">
         <div class="col-md-10">
-            <input type="text" name="outage-picker" data-latest-outages="{{ latestOutages|json_encode() }}" data-provide="slider" data-slider-tooltip="hide">
+            <div>
+            <input type="text" name="outage-picker" data-latest-outages="{{ latestOutages|json_encode() }}">
+            </div>
             <div id="map" data-zoom="{{ google_map.zoom }}" data-center-location="{{ google_map.center_location|json_encode() }}"></div>
         </div>
         <div class="col-md-2">
             <h3>Metrics</h3>
-            <table id="metrics-table" class="table table-striped">
-                <tbody></tbody>
-            </table>
+            <div id="metrics-accordion" role="tablist" aria-multiselectable="true">
+                <div class="card metric-template hide">
+                    <div class="card-header" role="tab" id="headingOne">
+                        <h5 class="mb-0">
+                            <a class="metric-title" data-toggle="collapse" data-parent="#metrics-accordion"></a>
+                        </h5>
+                    </div>
+
+                  <div class="collapse metric-body" role="tabpanel">
+                      <div class="card-block">
+                          <table class="table table-striped">
+                              <tbody></tbody>
+                          </table>
+                      </div>
+                  </div>
+                </div>
+            </div>
         </div>
     </div>
 {% endblock %}
