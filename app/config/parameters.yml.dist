@@ -43,5 +43,5 @@ parameters:
     google_map:
         zoom: 10
         center_location: 
-            lat: 35.046701
-            lng: -85.314232
+            lat: 35.117331
+            lng: -85.249493
