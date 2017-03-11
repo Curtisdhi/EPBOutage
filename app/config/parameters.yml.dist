@@ -39,6 +39,7 @@ parameters:
     # A secret key that's used to generate certain security-related tokens
     secret:            ThisTokenIsNotSoSecretChangeIt
     epb_api_url: https://epb.com/api/v3/outages
+    google_analytics_key: UA-52303307-5
     google_api_key: AIzaSyCfImfU_gTKRQro0FsbIBz4iyMX2hef9JM
     google_map:
         zoom: 10

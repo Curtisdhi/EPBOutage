@@ -40,6 +40,7 @@ twig:
     form_themes:
         - "bootstrap_3_layout.html.twig"
     globals:
+        google_analytics_key: %google_analytics_key%
         google_api_key: %google_api_key%
         google_map: %google_map%
 
