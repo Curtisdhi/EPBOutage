@@ -24,7 +24,8 @@ $(document).ready(function () {
         value: ticks.length,
         ticks: ticks,
         ticks_labels: ticksLabels,
-        ticks_tooltip: true
+        ticks_tooltip: true,
+        orientation: 'vertical'
     }).change(function () {
         var id = getIdFromOutagesByIndex(parseInt($(this).val()));
         if (id) {

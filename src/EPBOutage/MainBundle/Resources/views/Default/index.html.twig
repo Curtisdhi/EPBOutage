@@ -10,17 +10,17 @@
 
 {% block content %}
     <div class="row">
-        <div class="col-md-10">
-            <div>
+        <div class="col-md-1">
             <input type="text" name="outage-picker" data-latest-outages="{{ latestOutages|json_encode() }}">
-            </div>
+        </div>
+        <div class="col-md-9">
             <div id="map" data-zoom="{{ google_map.zoom }}" data-center-location="{{ google_map.center_location|json_encode() }}"></div>
             <div class="row">
                 <div class="col-md-4">
                     <div class="form-group">
-                        <label>Major outages: <smll class="text-muted">All outages with 1,000 affected customers.</small></label> &nbsp;
+                        <label>Major outages: <smll class="text-muted">All outages with over 1,000 affected customers.</small></label> &nbsp;
                         <select class="form-control" name="majorOutage">
-                            <option disabled="disabled" selected="selected">Select an outage to display</option>
+                            <option selected="selected">Select an outage to display</option>
                             {% for m in majorOutages %}
                                 <option value="{{ m._id }}">{{ m.updatedOn.sec|date('M d, Y') }} ({{ m.metrics.currentOutages }} outages)</option>
                             {% endfor %}

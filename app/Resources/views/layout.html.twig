@@ -6,7 +6,10 @@
             <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <a class="navbar-brand" href="#">EPBOutage</a>
+            <a class="navbar-brand" href="{{ path('main_index') }}">
+                EPBOutage.info<br>
+                <small class="text-muted" style="font-size:10px;">*Not affiliated with EPB</small>
+            </a>
 
             <div class="collapse navbar-collapse" id="navbarsExampleDefault">
                 <ul class="navbar-nav mr-auto">
@@ -15,6 +18,15 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{ path('about') }}">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://epb.com/outage-map" target="_blank">
+                            Realtime Map
+                            <small class="text-muted">on EPB's website</small>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://epb.com" target="_blank">EPB Homepage</a>
                     </li>
                 </ul>
             </div>
