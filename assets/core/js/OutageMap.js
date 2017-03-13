@@ -32,9 +32,8 @@ OutageMap.prototype = {
         
     },
     
-    loadOutageData: function(id) {
+    loadOutageDataFromRemote: function(id) {
         var _self = this;
-        _self.clearOverlays();
         var route = null;
         if (_.isUndefined((id))) {
             route = Routing.generate('ajax_fetch_current_outage');
@@ -42,8 +41,31 @@ OutageMap.prototype = {
             route = Routing.generate('ajax_fetch_outage', {id: id});
         }
         $.post(route).done(function(data) {
+            if (!_.isUndefined((id))) {
+                _self.saveOutageData(id, data);
+            }
             _self.drawData(data);
         });
+    },
+    
+    saveOutageData: function(id, data) {
+        sessionStorage.setItem('outage_'+ id, JSON.stringify(data));
+    },
+    
+    loadOutageData: function(id) {
+        var _self = this;
+        _self.clearOverlays();
+        
+        if (_.isUndefined((id))) {
+            _self.loadOutageDataFromRemote();
+        } else {
+            var data = JSON.parse(sessionStorage.getItem('outage_'+ id));
+            if (!data) {
+                _self.loadOutageDataFromRemote(id);
+            } else {
+                _self.drawData(data);
+            }
+        }
     },
     
     clearOverlays: function() {

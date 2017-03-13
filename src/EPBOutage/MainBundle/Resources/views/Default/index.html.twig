@@ -20,10 +20,9 @@
                     <div class="form-group">
                         <label>Major outages: <smll class="text-muted">All outages with 1,000 affected customers.</small></label> &nbsp;
                         <select class="form-control" name="majorOutage">
+                            <option disabled="disabled" selected="selected">Select an outage to display</option>
                             {% for m in majorOutages %}
                                 <option value="{{ m._id }}">{{ m.updatedOn.sec|date('M d, Y') }} ({{ m.metrics.currentOutages }} outages)</option>
-                            {% else %}
-                                <option disabled="disabled" selected="selected">No major outages!</option>
                             {% endfor %}
                         </select>
                     </div>
