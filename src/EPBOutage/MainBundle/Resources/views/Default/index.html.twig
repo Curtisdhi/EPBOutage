@@ -5,63 +5,7 @@
 {% endblock %}
 
 {% block javascript %}
-    <script>        
-        $(document).ready(function () {
-            var map = $('#map');
-            var metricsTableElement = $('#metrics-accordion');
-            outageMap = new OutageMap(map, metricsTableElement, map.data('zoom'), map.data('center-location'));
-            outageMap.load();
-            outageMap.loadOutageData();
-                
-            var mySlider = $("input[name='outage-picker']");
-            var latestOutages = mySlider.data('latest-outages');
-            
-            var ticks = [];
-            var ticksLabels = [];
-            
-            var tick = 0;
-            _.each(latestOutages, function(v) {
-                ticks.push(++tick);
-                var m = new Date(v.updatedOn.sec*1000); 
-                var dateStr = m.getUTCFullYear() + "/" +
-                    ("0" + (m.getUTCMonth()+1)).slice(-2) + "/" +
-                    ("0" + m.getUTCDate()).slice(-2) + " " +
-                    ("0" + m.getUTCHours()).slice(-2) + ":" +
-                    ("0" + m.getUTCMinutes()).slice(-2);
-                ticksLabels.push(dateStr);
-            });
-            
-            mySlider.slider({
-                min: 1,
-                max: ticks.length,
-                step: 1,
-                value: ticks.length,
-                ticks: ticks,
-                ticks_labels: ticksLabels,
-                ticks_tooltip: true
-            }).change(function() {
-                var id = getIdFromOutagesByIndex(parseInt($(this).val()));
-                if (id) {
-                    outageMap.loadOutageData(id);
-                }
-            });
-            
-            function getIdFromOutagesByIndex(index) {
-                var i = 1;
-                var o = null;
-                _.each(latestOutages, function(v) {
-                    if (i === index) {
-                        o = v;
-                        return false;
-                    }
-                    i++;
-                });
-                return o ? o._id.$id : null;
-            }
-            
 
-        });
-    </script>
 {% endblock %}
 
 {% block content %}
@@ -71,6 +15,20 @@
             <input type="text" name="outage-picker" data-latest-outages="{{ latestOutages|json_encode() }}">
             </div>
             <div id="map" data-zoom="{{ google_map.zoom }}" data-center-location="{{ google_map.center_location|json_encode() }}"></div>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Major outages: <smll class="text-muted">All outages with 1,000 affected customers.</small></label> &nbsp;
+                        <select class="form-control" name="majorOutage">
+                            {% for m in majorOutages %}
+                                <option value="{{ m._id }}">{{ m.updatedOn.sec|date('M d, Y') }} ({{ m.metrics.currentOutages }} outages)</option>
+                            {% else %}
+                                <option disabled="disabled" selected="selected">No major outages!</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
         </div>
         <div class="col-md-2">
             <h3>Metrics</h3>

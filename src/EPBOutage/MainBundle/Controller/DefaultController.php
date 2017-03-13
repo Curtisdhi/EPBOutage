@@ -22,7 +22,14 @@ class DefaultController extends Controller
             ->getRepository('EPBOutageMainBundle:Outage');
         $latestOutages = $repo->findLatestWithIdAndUpdatedDate(10);
         
-        return array('latestOutages' => $latestOutages);
+        $majorOutages = $repo->findMajorOutages(1000);
+        
+        foreach ($latestOutages as $key => $outage) {
+            $latestOutages[$key]['updatedOnFormatted'] = $latestOutages[$key]['updatedOn']->toDateTime()->format('M d, Y H:i');
+        }
+        
+        return array('latestOutages' => $latestOutages,
+            'majorOutages' => $majorOutages);
     }
     
      /**
