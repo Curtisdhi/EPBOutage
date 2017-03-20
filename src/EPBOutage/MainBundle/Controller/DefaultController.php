@@ -25,7 +25,8 @@ class DefaultController extends Controller
         $majorOutages = $repo->findMajorOutages(1000);
         
         foreach ($latestOutages as $key => $outage) {
-            $latestOutages[$key]['updatedOnFormatted'] = $latestOutages[$key]['updatedOn']->toDateTime()->format('M d, Y H:i');
+            $latestOutages[$key]['updatedOnFormatted'] = $latestOutages[$key]['updatedOn']->toDateTime()
+                    ->setTimezone(new \DateTimeZone(date_default_timezone_get()))->format('M d, Y H:i');
         }
         
         return array('latestOutages' => $latestOutages,
