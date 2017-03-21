@@ -10,12 +10,28 @@
 
 {% block content %}
     <div class="row">
-        <div class="col-md-1">
-            <input type="text" name="outage-picker" data-latest-outages="{{ latestOutages|json_encode() }}">
-        </div>
-        <div class="col-md-9">
-            <div id="map" data-zoom="{{ google_map.zoom }}" data-center-location="{{ google_map.center_location|json_encode() }}"></div>
+        <div class="col-md-10">
             <div class="row">
+                <div class="col-md-2">
+                    <input type="text" name="outage-picker" data-latest-outages="{{ latestOutages|json_encode() }}">
+                </div>
+                <div class="col-md-10">
+                    <div id="map" data-zoom="{{ google_map.zoom }}" data-center-location="{{ google_map.center_location|json_encode() }}"></div>
+                </div>
+            </div>
+                <br>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Pick a starting date:</label> &nbsp;
+                        <div id="outage-datetime-picker" class="input-group date" data-isset="{{ startDate ? 'true' : 'false' }}">
+                            <input type="text" class="form-control" value="{{ startDate|date('M d, Y H:i') }}">
+                            <span class="input-group-addon">
+                                <i class="fa fa-calendar"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
                 <div class="col-md-4">
                     <div class="form-group">
                         <label>Major outages: <smll class="text-muted">All outages with over 1,000 affected customers.</small></label> &nbsp;
@@ -27,6 +43,7 @@
                         </select>
                     </div>
                 </div>
+
             </div>
         </div>
         <div class="col-md-2">
@@ -39,13 +56,13 @@
                         </h5>
                     </div>
 
-                  <div class="collapse metric-body" role="tabpanel">
-                      <div class="card-block">
-                          <table class="table table-striped">
-                              <tbody></tbody>
-                          </table>
-                      </div>
-                  </div>
+                    <div class="collapse metric-body" role="tabpanel">
+                        <div class="card-block">
+                            <table class="table table-striped">
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

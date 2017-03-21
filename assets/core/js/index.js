@@ -16,12 +16,15 @@ $(document).ready(function () {
         ticks.push(++tick);
         ticksLabels.push(v.updatedOnFormatted);
     });
+    
+    //get rather or not an precise date has been set
+    var startDateSet = $('#outage-datetime-picker').data('isset');
 
     mySlider.slider({
         min: 1,
         max: ticks.length,
         step: 1,
-        value: ticks.length,
+        value: startDateSet ? 0 : ticks.length,
         ticks: ticks,
         ticks_labels: ticksLabels,
         ticks_tooltip: true,
@@ -31,6 +34,14 @@ $(document).ready(function () {
         if (id) {
             outageMap.loadOutageData(id);
         }
+    });
+    
+    $('#outage-datetime-picker').datetimepicker({
+        format: 'M dd, yyyy hh:ii',
+        minuteStep: 60
+    })
+        .on('changeDate', function(e){
+            window.location = Routing.generate('main_index', {'start_date': (e.date.getTime() / 1000)});
     });
     
     $('select[name="majorOutage"]').change(function() {

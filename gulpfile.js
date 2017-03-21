@@ -78,7 +78,8 @@ gulp.task('build:js:vendors', function() {
         'assets/vendors/tether/dist/js/tether.js',
         'assets/vendors/bootstrap/dist/js/bootstrap.js',
         'assets/vendors/bootstrap-toggle/js/bootstrap-toggle.js',
-        'assets/vendors/seiyria-bootstrap-slider/dist/bootstrap-slider.js',
+        'assets/vendors/seiyria-bootstrap-slider/dist/bootstrap-slider.js', 
+        'assets/vendors/datetimepicker/js/bootstrap-datetimepicker.js', 
         'assets/vendors/js-map-label/src/maplabel.js'
         ])
         .pipe(plumber())
@@ -117,6 +118,7 @@ gulp.task('build:css:vendors', function() {
             'assets/vendors/animate.css/animate.css',
             'assets/vendors/awesome-bootstrap-checkbox/awesome-bootstrap-checkbox.css',
             'assets/vendors/seiyria-bootstrap-slider/dist/css/bootstrap-slider.css',
+            'assets/vendors/datetimepicker/css/bootstrap-datetimepicker.css'
         ])
         .pipe(plumber())
         .pipe(concatCss("vendor.min.css", {rebaseUrls: false}))
@@ -168,7 +170,8 @@ gulp.task('deploy:build', function() {
 
 gulp.task('deploy:fonts', function() {
     return gulp.src(['assets/vendors/font-awesome/fonts/*',
-        'assets/vendors/bootstrap/fonts/*'
+        'assets/vendors/bootstrap/fonts/*',
+        'core/fonts/*'
         ])
         .pipe(gulp.dest(deployDir +'fonts/'));
 });

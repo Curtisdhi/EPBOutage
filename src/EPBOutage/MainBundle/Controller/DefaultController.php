@@ -13,14 +13,20 @@ class DefaultController extends Controller
 {
     
     /**
-     * @Route("/", name="main_index")
+     * @Route("/", name="main_index", options={"expose":true})
      * @Template()
      */
-    public function indexAction()
+    public function indexAction(Request $request)
     {
         $repo = $this->get('doctrine_mongodb')
             ->getRepository('EPBOutageMainBundle:Outage');
-        $latestOutages = $repo->findLatestWithIdAndUpdatedDate(10);
+        
+        $startDate = $request->get('start_date');
+        if (!is_null($startDate)) {
+            $startDate = (new \Datetime())->setTimestamp($startDate);
+        }
+        
+        $latestOutages = $repo->findLatestWithIdAndUpdatedDate(10, $startDate);
         
         $majorOutages = $repo->findMajorOutages(1000);
         
@@ -30,7 +36,8 @@ class DefaultController extends Controller
         }
         
         return array('latestOutages' => $latestOutages,
-            'majorOutages' => $majorOutages);
+            'majorOutages' => $majorOutages,
+            'startDate' => $startDate);
     }
     
      /**

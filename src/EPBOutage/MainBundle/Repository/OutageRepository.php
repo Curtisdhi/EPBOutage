@@ -13,12 +13,22 @@ class OutageRepository extends DocumentRepository {
         return $qb->getQuery()->getSingleResult();
     }
     
-    public function findLatestWithIdAndUpdatedDate($limit = 1) {
+    public function findLatestWithIdAndUpdatedDate($limit = 1, $startDate = null) {
         $qb = $this->dm->createQueryBuilder('EPBOutageMainBundle:Outage')
             ->select('updatedOn')
-            ->sort('updatedOn', 'desc')
             ->limit($limit);
-        return array_reverse($qb->hydrate(false)->getQuery()->execute()->toArray());
+        $reverse = false;
+        
+        if (!is_null($startDate) && $startDate instanceof \DateTime) {
+            $qb->field('updatedOn')->gte($startDate)
+                ->sort('updatedOn', 'asc');
+        } else {
+            $qb->sort('updatedOn', 'desc');
+            $reverse = true;
+        }
+        
+        $results = $qb->hydrate(false)->getQuery()->execute()->toArray();
+        return $reverse ? array_reverse($results) : $results;
     }
     
     public function findMajorOutages($minOutages) {
