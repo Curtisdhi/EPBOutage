@@ -78,7 +78,6 @@ gulp.task('build:js:vendors', function() {
         'assets/vendors/tether/dist/js/tether.js',
         'assets/vendors/bootstrap/dist/js/bootstrap.js',
         'assets/vendors/bootstrap-toggle/js/bootstrap-toggle.js',
-        'assets/vendors/seiyria-bootstrap-slider/dist/bootstrap-slider.js', 
         'assets/vendors/datetimepicker/js/bootstrap-datetimepicker.js', 
         'assets/vendors/js-map-label/src/maplabel.js'
         ])
@@ -117,7 +116,6 @@ gulp.task('build:css:vendors', function() {
             'assets/vendors/bootstrap-toggle/css/bootstrap-toggle.css',
             'assets/vendors/animate.css/animate.css',
             'assets/vendors/awesome-bootstrap-checkbox/awesome-bootstrap-checkbox.css',
-            'assets/vendors/seiyria-bootstrap-slider/dist/css/bootstrap-slider.css',
             'assets/vendors/datetimepicker/css/bootstrap-datetimepicker.css'
         ])
         .pipe(plumber())

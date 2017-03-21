@@ -231,7 +231,8 @@ OutageMap.prototype = {
                 disable = false;
             }
             if (disable) {
-                groupEl.find('.metric-title').attr('href', '').addClass('disabled');
+                groupEl.remove();
+                //groupEl.find('.metric-title').attr('href', '').addClass('disabled');
             }
         });
         

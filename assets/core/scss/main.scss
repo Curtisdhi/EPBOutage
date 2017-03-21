@@ -25,12 +25,22 @@ body {
     height: 75vh;
 }
 
+select[name="outage-picker"] {
+    width: 200px;
+}
+
 .slider {
     margin-top: 10px;
     height: 72vh !important;
     
     .slider-tick-label {
         font-size: 14px;
+    }
+}
+
+@media (max-width: 767px) {
+    .slider-tick-label {
+        display: none
     }
 }
 
@@ -45,5 +55,27 @@ body {
     .metric-title.disabled {
         color: #000;
         text-decoration: none;
+    }
+}
+
+@media (max-width: 992px) {
+    .metrics-sidebar {
+        position: absolute;
+        top: 0;
+        right: 0;
+        z-index: 10;
+        .btn-metrics-toggler {
+            position: absolute;
+            top: 0;
+            right: 4px;
+            color: #000;
+            z-index: 11;
+        }
+        .metrics {
+            position: absolute;
+            top: 0;
+            right: 0;
+            display: none;
+        }
     }
 }

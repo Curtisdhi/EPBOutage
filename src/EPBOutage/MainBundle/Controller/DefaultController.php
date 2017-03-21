@@ -26,7 +26,7 @@ class DefaultController extends Controller
             $startDate = (new \Datetime())->setTimestamp($startDate);
         }
         
-        $latestOutages = $repo->findLatestWithIdAndUpdatedDate(10, $startDate);
+        $latestOutages = $repo->findLatestWithIdAndUpdatedDate(24, $startDate);
         
         $majorOutages = $repo->findMajorOutages(1000);
         
