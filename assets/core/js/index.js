@@ -3,8 +3,6 @@ $(document).ready(function () {
     var metricsTableElement = $('#metrics-accordion');
     outageMap = new OutageMap(map, metricsTableElement, map.data('zoom'), map.data('center-location'));
     outageMap.load();
-    outageMap.loadOutageData();
-
     var mySlider = $("input[name='outage-picker']");
     var latestOutages = mySlider.data('latest-outages');
 
@@ -19,7 +17,7 @@ $(document).ready(function () {
     
     //get rather or not an precise date has been set
     var startDateSet = $('#outage-datetime-picker').data('isset');
-
+    
     mySlider.slider({
         min: 1,
         max: ticks.length,
@@ -47,6 +45,19 @@ $(document).ready(function () {
     $('select[name="majorOutage"]').change(function() {
        outageMap.loadOutageData($(this).val()); 
     });
+    
+    var loaded = false;
+    if (startDateSet) {
+        var id = getIdFromOutagesByIndex(parseInt(mySlider.val()));
+        if (id) {
+            outageMap.loadOutageData(id);
+            loaded = true;
+        }
+    } 
+    
+    if (!loaded) {
+        outageMap.loadOutageData();
+    }
 
     function getIdFromOutagesByIndex(index) {
         var i = 1;
