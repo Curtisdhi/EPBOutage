@@ -28,13 +28,13 @@ class OutageRepository extends DocumentRepository {
         }
         
         $results = $qb->hydrate(false)->getQuery()->execute()->toArray();
-        return $reverse ? array_reverse($results) : $results;
+        return !$reverse ? array_reverse($results) : $results;
     }
     
     public function findMajorOutages($minOutages) {
         $qb = $this->dm->createQueryBuilder('EPBOutageMainBundle:Outage')
             ->select('updatedOn', 'metrics.currentOutages')
-            ->sort(array('updatedOn' => 'desc', 'metrics.currentOutages' => 'desc'))
+            ->sort(array('updatedOn' => 'asc', 'metrics.currentOutages' => 'desc'))
             ->field('metrics.currentOutages')->gte($minOutages);
         
         $outages = $qb->hydrate(false)->getQuery()->execute()->toArray();
@@ -49,6 +49,6 @@ class OutageRepository extends DocumentRepository {
             }
         }
         
-        return $outages;
+        return array_reverse($outages);
     }
 }
