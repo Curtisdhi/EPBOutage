@@ -13,9 +13,17 @@ class OutageRepository extends DocumentRepository {
         return $qb->getQuery()->getSingleResult();
     }
     
-    public function findLatestWithIdAndUpdatedDate($limit = 1, $startDate = null) {
+    public function findLatestNearId($limit, $id) {
         $qb = $this->dm->createQueryBuilder('EPBOutageMainBundle:Outage')
             ->select('updatedOn')
+            ->field('_id')->equals($id);
+        $outage = $qb->hydrate(false)->getQuery()->getSingleResult();
+        return $this->findLatestWithIdAndUpdatedDate($limit, $outage['updatedOn']->toDateTime()->modify('-24 hours'));
+    }
+    
+    public function findLatestWithIdAndUpdatedDate($limit = 1, $startDate = null) {
+        $qb = $this->dm->createQueryBuilder('EPBOutageMainBundle:Outage')
+            ->select('updatedOn', 'metrics.currentOutages')
             ->limit($limit);
         $reverse = false;
         
@@ -34,21 +42,22 @@ class OutageRepository extends DocumentRepository {
     public function findMajorOutages($minOutages) {
         $qb = $this->dm->createQueryBuilder('EPBOutageMainBundle:Outage')
             ->select('updatedOn', 'metrics.currentOutages')
-            ->sort(array('updatedOn' => 'asc', 'metrics.currentOutages' => 'desc'))
             ->field('metrics.currentOutages')->gte($minOutages);
         
         $outages = $qb->hydrate(false)->getQuery()->execute()->toArray();
         
-        $date = null;
+        $dailyMajorOutages = array();
         foreach ($outages as $key => $outage) {
-            $newDate = $outage['updatedOn']->toDateTime();
-            if (!is_null($date) && $date->format('Y/m/d') === $newDate->format('Y/m/d')) {
-                unset($outages[$key]);
-            } else {
-                $date = $newDate;
+            $date = $outage['updatedOn']->toDateTime()->setTimezone(new \DateTimeZone(date_default_timezone_get()));
+            $d = $date->format('Y/m/d');
+            
+            if (!isset($dailyMajorOutages[$d]) || 
+                    $dailyMajorOutages[$d]['metrics']['currentOutages'] < $outage['metrics']['currentOutages']) {
+                $dailyMajorOutages[$d] = $outage;
             }
+
         }
         
-        return array_reverse($outages);
+        return $dailyMajorOutages;
     }
 }

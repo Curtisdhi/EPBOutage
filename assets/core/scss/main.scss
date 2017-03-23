@@ -26,16 +26,7 @@ body {
 }
 
 select[name="outage-picker"] {
-    width: 200px;
-}
-
-.slider {
-    margin-top: 10px;
-    height: 72vh !important;
-    
-    .slider-tick-label {
-        font-size: 14px;
-    }
+    width: 320px;
 }
 
 @media (max-width: 767px) {

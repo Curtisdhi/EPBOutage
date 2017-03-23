@@ -4,9 +4,6 @@ $(document).ready(function () {
     outageMap = new OutageMap(map, metricsTableElement, map.data('zoom'), map.data('center-location'));
     outageMap.load();
 
-    //get rather or not an precise date has been set
-    var startDateSet = $('#outage-datetime-picker').data('isset');
-    
     $('#outage-datetime-picker').datetimepicker({
         format: 'M dd, yyyy hh:ii',
         minuteStep: 60
@@ -22,18 +19,28 @@ $(document).ready(function () {
         $(this).closest('.metrics-sidebar').find('.metrics').animate({width:'toggle'});
     });
     
-    var loaded = false;
-    if (startDateSet) {
-        var id = $('select[name="outage-picker"]').val();
-        if (id) {
-            outageMap.loadOutageData(id);
-            loaded = true;
-        }
-    } 
+    map.on('outage:loaded', function(e, data) {
+        var url = Routing.generate('main_index', {id: data.id}, true);
+        $('.btn-share').data('href', url); 
+    });
     
-    if (!loaded) {
-        outageMap.loadOutageData();
-    }
+    $('.btn-share').click(function(e) {
+        var btn = $(this);
+        
+        var $temp = $("<input>");
+        $("body").append($temp);
+        $temp.val(btn.data('href')).select();
+        document.execCommand("copy");
+        $temp.remove();
+        
+        setTimeout(function() {
+            btn.tooltip('hide');
+        }, 2000);
+    }).tooltip({
+        trigger: 'click'
+    });
 
 
+    var id = $('select[name="outage-picker"]').val();
+    outageMap.loadOutageData(id);
 });

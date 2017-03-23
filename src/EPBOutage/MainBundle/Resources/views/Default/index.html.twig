@@ -12,13 +12,20 @@
     <div class="row">
         <div class="col-md-12 col-lg-10">
             <div class="map-body">
-                <select class="form-control" name="outage-picker">
-                    {% for outage in latestOutages %}
-                        <option value="{{ outage._id }}">{{ outage.updatedOnFormatted }}</option>
-                    {% endfor %}
-                </select>
+                <div class="form-group">
+                    <select class="form-control" name="outage-picker" style="display: inline-block;">
+                        {% for outage in latestOutages %}
+                            {% set selected = outage._id|trim == selectedOutage %}
+                            <option value="{{ outage._id }}" {% if selected %}selected="selected"{% endif %}>
+                                {{ outage.updatedOnFormatted }} ({{ outage.metrics.currentOutages|number_format }} outages)
+                            </option>
+                        {% endfor %}
+                    </select>
+                    <label style="display: inline-block;">Outages for the past 24 hours</label>
+                </div>
                 <div id="map" data-zoom="{{ google_map.zoom }}" data-center-location="{{ google_map.center_location|json_encode() }}"></div>
             </div>
+            <br>
             <div class="row">
                 <div class="col-md-4">
                     <div class="form-group">
@@ -34,15 +41,23 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-5">
                     <div class="form-group">
                         <label>Major outages: <smll class="text-muted">All outages with over 1,000 affected customers.</small></label> &nbsp;
                         <select class="form-control" name="majorOutage">
                             <option selected="selected">Select an outage to display</option>
                             {% for m in majorOutages %}
-                                <option value="{{ m._id }}">{{ m.updatedOn.sec|date('M d, Y') }} ({{ m.metrics.currentOutages }} outages)</option>
+                                <option value="{{ m._id }}">{{ m.updatedOn.sec|date('M d, Y') }} ({{ m.metrics.currentOutages|number_format }} outages)</option>
                             {% endfor %}
                         </select>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="pull-right">
+                        <button type="button" data-href="" class="btn btn-secondary btn-share" title="Copied to your clipboard. Now share with others!">
+                            <i class="fa fa-share-square-o"></i>
+                            Share
+                        </button>
                     </div>
                 </div>
 

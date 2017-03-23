@@ -41,10 +41,9 @@ OutageMap.prototype = {
             route = Routing.generate('ajax_fetch_outage', {id: id});
         }
         $.post(route).done(function(data) {
-            if (!_.isUndefined((id))) {
-                _self.saveOutageData(id, data);
-            }
+            _self.saveOutageData(data.id, data);
             _self.drawData(data);
+            _self.mapElement.trigger('outage:loaded', data);
         });
     },
     
@@ -64,6 +63,7 @@ OutageMap.prototype = {
                 _self.loadOutageDataFromRemote(id);
             } else {
                 _self.drawData(data);
+                _self.mapElement.trigger('outage:loaded', data);
             }
         }
     },
