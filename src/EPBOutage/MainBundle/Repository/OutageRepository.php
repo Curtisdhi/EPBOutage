@@ -18,7 +18,11 @@ class OutageRepository extends DocumentRepository {
             ->select('updatedOn')
             ->field('_id')->equals($id);
         $outage = $qb->hydrate(false)->getQuery()->getSingleResult();
-        return $this->findLatestWithIdAndUpdatedDate($limit, $outage['updatedOn']->toDateTime()->modify('-24 hours'));
+        $latestOutages = null;
+        if ($outage) {
+            $latestOutages = $this->findLatestWithIdAndUpdatedDate($limit, $outage['updatedOn']->toDateTime()->modify('-24 hours'));
+        }
+        return $latestOutages;
     }
     
     public function findLatestWithIdAndUpdatedDate($limit = 1, $startDate = null) {

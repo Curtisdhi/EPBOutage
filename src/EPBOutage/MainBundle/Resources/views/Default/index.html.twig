@@ -9,6 +9,9 @@
 {% endblock %}
 
 {% block content %}
+    {% for flashMessage in app.session.flashbag.get('invalid_id') %}
+            <div class="alert alert-danger">{{ flashMessage|raw }}</div>
+        {% endfor %}
     <div class="row">
         <div class="col-md-12 col-lg-10">
             <div class="map-body">

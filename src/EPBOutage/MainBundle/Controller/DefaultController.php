@@ -96,7 +96,12 @@ class DefaultController extends Controller
         
         if ($id !== 0) {
             $latestOutages = $repo->findLatestNearId(24, $id);
-        } else {
+            if (is_null($latestOutages)) {
+                $this->get('session')->getFlashBag()->set('invalid_id', 'Invalid outage ID!');
+            }
+        } 
+        
+        if (!$latestOutages) {
             $latestOutages = $repo->findLatestWithIdAndUpdatedDate(24, $startDate);
             reset($latestOutages);
             if ($hasStartDate) {
