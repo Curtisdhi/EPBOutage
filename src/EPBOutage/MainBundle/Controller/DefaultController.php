@@ -13,51 +13,7 @@ use EPBOutage\MainBundle\Form\Type\ContactType;
 
 class DefaultController extends Controller
 {
-    
-    /**
-     * @Route("/index/{id}", name="main_index", defaults={"id" = 0}, options={"expose":true})
-     * @Template()
-     */
-    public function indexAction(Request $request, $id)
-    {
-        $repo = $this->get('doctrine_mongodb')
-            ->getRepository('EPBOutageMainBundle:Outage');
-        
-        $selectedOutage = $id;
-        
-        $hasStartDate = false;
-        $startDate = $request->get('start_date');
-        if (!is_null($startDate)) {
-            $startDate = (new \Datetime())->setTimestamp($startDate);
-            $hasStartDate = true;
-        }
-        
-        if ($id !== 0) {
-            $latestOutages = $repo->findLatestNearId(24, $id);
-        } else {
-            $latestOutages = $repo->findLatestWithIdAndUpdatedDate(24, $startDate);
-            reset($latestOutages);
-            if ($hasStartDate) {
-                $o = end($latestOutages);
-                reset($latestOutages);
-            } else {
-                $o = current($latestOutages);
-            }
-            $selectedOutage = $o['_id'];
-        }
-        $majorOutages = $repo->findMajorOutages(1000);
-        
-        foreach ($latestOutages as $key => $outage) {
-            $latestOutages[$key]['updatedOnFormatted'] = $latestOutages[$key]['updatedOn']->toDateTime()
-                    ->setTimezone(new \DateTimeZone(date_default_timezone_get()))->format('M d, Y H:i');
-        }
-        
-        return array('latestOutages' => $latestOutages,
-            'majorOutages' => $majorOutages,
-            'selectedOutage' => $selectedOutage,
-            'startDate' => $startDate);
-    }
-    
+
      /**
      * @Route("/about", name="about")
      * @Template()
@@ -118,5 +74,49 @@ class DefaultController extends Controller
         $outage = $repo->find($id);
         
         return new JsonResponse($outage);
+    }
+    
+    /**
+     * @Route("/{id}", name="main_index", defaults={"id" = 0}, options={"expose":true})
+     * @Template()
+     */
+    public function indexAction(Request $request, $id)
+    {
+        $repo = $this->get('doctrine_mongodb')
+            ->getRepository('EPBOutageMainBundle:Outage');
+        
+        $selectedOutage = $id;
+        
+        $hasStartDate = false;
+        $startDate = $request->get('start_date');
+        if (!is_null($startDate)) {
+            $startDate = (new \Datetime())->setTimestamp($startDate);
+            $hasStartDate = true;
+        }
+        
+        if ($id !== 0) {
+            $latestOutages = $repo->findLatestNearId(24, $id);
+        } else {
+            $latestOutages = $repo->findLatestWithIdAndUpdatedDate(24, $startDate);
+            reset($latestOutages);
+            if ($hasStartDate) {
+                $o = end($latestOutages);
+                reset($latestOutages);
+            } else {
+                $o = current($latestOutages);
+            }
+            $selectedOutage = $o['_id'];
+        }
+        $majorOutages = $repo->findMajorOutages(1000);
+        
+        foreach ($latestOutages as $key => $outage) {
+            $latestOutages[$key]['updatedOnFormatted'] = $latestOutages[$key]['updatedOn']->toDateTime()
+                    ->setTimezone(new \DateTimeZone(date_default_timezone_get()))->format('M d, Y H:i');
+        }
+        
+        return array('latestOutages' => $latestOutages,
+            'majorOutages' => $majorOutages,
+            'selectedOutage' => $selectedOutage,
+            'startDate' => $startDate);
     }
 }
