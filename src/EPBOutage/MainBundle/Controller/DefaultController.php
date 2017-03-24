@@ -8,12 +8,14 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use EPBOutage\MainBundle\Form\Model\ContactModel;
+use EPBOutage\MainBundle\Form\Type\ContactType;
 
 class DefaultController extends Controller
 {
     
     /**
-     * @Route("/{id}", name="main_index", defaults={"id" = 0}, options={"expose":true})
+     * @Route("/index/{id}", name="main_index", defaults={"id" = 0}, options={"expose":true})
      * @Template()
      */
     public function indexAction(Request $request, $id)
@@ -60,9 +62,38 @@ class DefaultController extends Controller
      * @Route("/about", name="about")
      * @Template()
      */
-    public function aboutAction()
+    public function aboutAction(Request $request)
     {
-        return;
+        $form = $this->createForm(new ContactType(), new ContactModel());
+        $form->handleRequest($request);
+        if ($form->isValid()) {
+            $contact = $form->getData();
+            
+            $recevier =  $this->container->getParameter('mailer_recevier');
+            $noreply =  $this->container->getParameter('mailer_noreply');
+            
+            try {
+                $message = \Swift_Message::newInstance()
+                    ->setSubject('Contact by '. $contact->getName())
+                    ->setFrom($noreply)
+                    ->setTo($recevier)
+                    ->setContentType("text/html")    
+                    ->setBody($this->renderView(
+                        'EPBOutageMainBundle:Email:contact.html.twig',
+                        array('contact' => $contact)
+                    ));
+                $this->get('session')->getFlashBag()->set('email_success', 'Thank you for sending us an email! <i class="fa fa-smile-o"></i><br> We shall respond shortly.');
+                $this->get('mailer')->send($message);
+                
+                return $this->redirectToRoute('about');
+            }
+            catch(\Swift_TransportException $e) {
+                $form->addError(new FormError("Failed to send email! If this continues to be a problem, "
+                        . "feel free to contact us by other means. Sorry for the inconvenience"));
+            }
+            
+        }
+        return array('form' => $form->createView());
     }
     
     /**

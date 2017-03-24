@@ -1,0 +1,16 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta name="viewport" content="width=device-width"/>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<meta name="author" content="{{ application_name }}">
+<title>{% block title %}{{ site_name }} | Contact From {{ contact.name }}{% endblock %}</title>
+</head>
+<body bgcolor="#ABABAB" color="#FFFFFF">
+ 
+    <h2>Sent from contact page ({{ site_name }}) by <strong>{{ contact.name }}</strong></h2>
+    <p><label>Email:</label> <strong>{{ contact.email }}</strong></p>
+    <p><label>Message:</label> {{ contact.message }}</p>
+
+</body>
+</html>

@@ -31,6 +31,7 @@ parameters:
     mailer_password: '27e3b22ef1ca0811afcd2beb054d3ee0'
     mailer_encryption: tls
     mailer_recevier: demo@demo.com
+    mailer_noreply: noreply@epboutage.info
     locale: en
     # en: en
     recaptcha_public_key: 6Lf12xEUAAAAAEvfkj8iFiazZ5FmRTdkthAb937V
