@@ -62,6 +62,6 @@ class OutageRepository extends DocumentRepository {
 
         }
         
-        return $dailyMajorOutages;
+        return array_reverse($dailyMajorOutages);
     }
 }

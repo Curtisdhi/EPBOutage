@@ -86,6 +86,7 @@ class DefaultController extends Controller
             ->getRepository('EPBOutageMainBundle:Outage');
         
         $selectedOutage = $id;
+        $latestOutages = null;
         
         $hasStartDate = false;
         $startDate = $request->get('start_date');

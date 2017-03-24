@@ -24,7 +24,7 @@
                             </option>
                         {% endfor %}
                     </select>
-                    <label style="display: inline-block;">Outages for the past 24 hours</label>
+                    <label class="hidden-xs-down" style="display: inline-block;">Outages for the past 24 hours</label>
                 </div>
                 <div id="map" data-zoom="{{ google_map.zoom }}" data-center-location="{{ google_map.center_location|json_encode() }}"></div>
             </div>
@@ -74,7 +74,7 @@
                 </button>
             </div>
             <div class="metrics">
-                <h3>Metrics</h3>
+                <h3 class="hidden-xs-down">Metrics</h3>
                 <div id="metrics-accordion" role="tablist" aria-multiselectable="true">
                     <div class="card metric-template hide">
                         <div class="card-header" role="tab" id="headingOne">
