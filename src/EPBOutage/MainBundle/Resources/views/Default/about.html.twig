@@ -18,7 +18,7 @@
         </div>
     </div>
     <div class="row justify-content-center">
-        <div class="col-6">
+        <div class="col-md-6 col-sm-12">
             <h3>Contact us</h3>
             {% for flashMessage in app.session.flashbag.get('email_success') %}
                 <div class="alert alert-success">{{ flashMessage|raw }}</div>
