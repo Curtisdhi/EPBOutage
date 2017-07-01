@@ -22,6 +22,12 @@ class Metrics implements \JsonSerializable
     
     /** @Mongo\Field(type="integer") */
     protected $totalSmartGridActivity;
+    
+    /** @Mongo\Field(type="integer") */
+    protected $smartGridRestores;
+    
+    /** @Mongo\Field(type="integer") */
+    protected $manualRestores;
             
     /** @Mongo\Field(type="integer") */
     protected $beginDtTm;
@@ -48,7 +54,15 @@ class Metrics implements \JsonSerializable
     public function getPreventedOutages() {
         return $this->preventedOutages;
     }
-
+    
+    function getSmartGridRestores() {
+        return $this->smartGridRestores;
+    }
+    
+    function getManualRestores() {
+        return $this->manualRestore;
+    }
+    
     public function getTotalSmartGridActivity() {
         return $this->totalSmartGridActivity;
     }
@@ -79,6 +93,14 @@ class Metrics implements \JsonSerializable
     public function setPreventedOutages($preventedOutages) {
         $this->preventedOutages = $preventedOutages;
         return $this;
+    }
+
+    function setSmartGridRestores($smartGridRestores) {
+        $this->smartGridRestores = $smartGridRestores;
+    }
+
+    function setManualRestores($manualRestores) {
+        $this->manualRestores = $manualRestores;
     }
 
     public function setTotalSmartGridActivity($totalSmartGridActivity) {

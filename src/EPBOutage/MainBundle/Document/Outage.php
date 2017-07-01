@@ -35,8 +35,8 @@ class Outage implements \JsonSerializable
      */
     protected $updatedOn;  
     
-    /** @Mongo\Field(type="string") */
-    protected $fullJson;
+    /** @Mongo\Field(type="hash") */
+    protected $fullJson = array();
 
     public function __construct() {
         
@@ -82,10 +82,11 @@ class Outage implements \JsonSerializable
         return $this->fullJson;
     }
 
-    public function setFullJson($fullJson) {
-        $this->fullJson = $fullJson;
+    public function setFullJson($key, $fullJson) {
+        $this->fullJson[$key] = $fullJson;
         return $this;
     }
+   
 
 
     public function getBoundaries() {

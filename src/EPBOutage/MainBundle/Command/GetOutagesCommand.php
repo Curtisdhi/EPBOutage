@@ -21,11 +21,14 @@ class GetOutagesCommand extends ContainerAwareCommand
     {
         $output->writeln('Downloading outages');
          
-        $loadUrl = $this->getContainer()->getParameter('epb_api_url');
-        $json = file_get_contents($loadUrl);
+        $loadUrls = $this->getContainer()->getParameter('epb_api_urls');
+        $jsonApi = array();
+        foreach ($loadUrls as $key => $url) {
+            $jsonApi[$key] = file_get_contents($url);
+        }
         
         $output->writeln('Parsing outages');
-        $this->getContainer()->get('epboutage.outage_importer')->importFromJsonString($json);
+        $this->getContainer()->get('epboutage.outage_importer')->importFromJsonApiArray($jsonApi);
         
         $output->writeln('Finished');
         
