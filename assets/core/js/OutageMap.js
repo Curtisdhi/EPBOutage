@@ -13,6 +13,7 @@ function OutageMap(mapElement,metricsElement, zoom, centerLocation) {
     this.metricsTemplate.removeClass('metric-template hide');
     this.dispatchJobInfo = {
       colors: {
+        DEFAULT: '#FF0000',
         OUTAGE_REPORTED: '#FF0000',
         REPAIR_IN_PROGRESS: '#ff8c4f'
       },
@@ -96,7 +97,7 @@ OutageMap.prototype = {
         });
         _.each(data.dispatches, function(v) {
             var center = {lat: parseFloat(v.latitude), lng: parseFloat(v.longitude)};
-            var color = '#FFFFFF';
+            var color = _self.dispatchJobInfo.colors['DEFAULT'];
             if (!_.isUndefined(_self.dispatchJobInfo.colors[v.jobStatus])) {
               color = _self.dispatchJobInfo.colors[v.jobStatus];
             }
