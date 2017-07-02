@@ -29,10 +29,10 @@ class MetricsImporter extends Importer {
         $docMetrics->setEndDtTm(strtotime($this->getVal('endDate', $metrics)));
         
         if (isset($metrics['summary']['SMART_GRID_RESTORE'])) {
-            $docMetrics->setSmartGridRestores($this->getVal('autoRestoredOutages', $metrics['summary']['SMART_GRID_RESTORE']));
+            $docMetrics->setSmartGridRestores($this->getVal('incidentQty', $metrics['summary']['SMART_GRID_RESTORE']));
         }
         if (isset($metrics['summary']['MANUAL_RESTORE'])) {
-            $docMetrics->setManualRestores($this->getVal('autoRestoredOutages', $metrics['summary']['MANUAL_RESTORE']));
+            $docMetrics->setManualRestores($this->getVal('incidentQty', $metrics['summary']['MANUAL_RESTORE']));
         }
         
         return $docMetrics;

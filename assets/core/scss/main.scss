@@ -42,10 +42,14 @@ select[name="outage-picker"] {
             padding: 0;
         }
     }
-    
+
     .metric-title.disabled {
         color: #000;
         text-decoration: none;
+    }
+
+    .table {
+      margin-bottom: 0;
     }
 }
 

@@ -60,7 +60,7 @@ class Metrics implements \JsonSerializable
     }
     
     function getManualRestores() {
-        return $this->manualRestore;
+        return $this->manualRestores;
     }
     
     public function getTotalSmartGridActivity() {
@@ -124,6 +124,8 @@ class Metrics implements \JsonSerializable
             'currentOutages' => $this->getCurrentOutages(),
             'durationOutages' => $this->getDurationOutages(),
             'preventedOutages' => $this->getPreventedOutages(),
+            'smartGridRestores' => $this->getSmartGridRestores(),
+            'manualRestores' => $this->getManualRestores(),
             'totalSmartGridActivity' => $this->getTotalSmartGridActivity(),
             'beginDtTm' => $this->getBeginDtTm(),
             'endDtTm' => $this->getEndDtTm(),

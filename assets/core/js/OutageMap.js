@@ -11,6 +11,16 @@ function OutageMap(mapElement,metricsElement, zoom, centerLocation) {
     this.metricsTemplate = metricsElement.find('.metric-template').clone();
     this.overlays = [];
     this.metricsTemplate.removeClass('metric-template hide');
+    this.dispatchJobInfo = {
+      colors: {
+        OUTAGE_REPORTED: '#FF0000',
+        REPAIR_IN_PROGRESS: '#ff8c4f'
+      },
+      userFriendlyName: {
+        OUTAGE_REPORTED: 'Outage Reported',
+        REPAIR_IN_PROGRESS: 'Repair in Progress'
+      }
+    };
 }
 
 OutageMap.prototype = {
@@ -18,7 +28,7 @@ OutageMap.prototype = {
         var _self = this;
         _self.initialized = true;
     },
-    
+
     load: function() {
         var _self = this;
         if (!_self.initialized) {
@@ -29,9 +39,9 @@ OutageMap.prototype = {
             center: _self.centerLocation,
             mapTypeId: 'terrain'
         });
-        
+
     },
-    
+
     loadOutageDataFromRemote: function(id) {
         var _self = this;
         var route = null;
@@ -46,15 +56,15 @@ OutageMap.prototype = {
             _self.mapElement.trigger('outage:loaded', data);
         });
     },
-    
+
     saveOutageData: function(id, data) {
         sessionStorage.setItem('outage_'+ id, JSON.stringify(data));
     },
-    
+
     loadOutageData: function(id) {
         var _self = this;
         _self.clearOverlays();
-        
+
         if (_.isUndefined((id))) {
             _self.loadOutageDataFromRemote();
         } else {
@@ -67,7 +77,7 @@ OutageMap.prototype = {
             }
         }
     },
-    
+
     clearOverlays: function() {
         var _self = this;
         _.each(_self.overlays, function(v)  {
@@ -75,8 +85,8 @@ OutageMap.prototype = {
         });
         _self.overlays = [];
     },
-    
-    
+
+
     drawData: function(data) {
         var _self = this;
         _self.data = data;
@@ -86,12 +96,16 @@ OutageMap.prototype = {
         });
         _.each(data.dispatches, function(v) {
             var center = {lat: parseFloat(v.latitude), lng: parseFloat(v.longitude)};
-            _self.overlays.push(_self.drawDispatchesOutages(v, center, '#FF0000', 0.5, 1, v.customerQty));
+            var color = '#FFFFFF';
+            if (!_.isUndefined(_self.dispatchJobInfo.colors[v.jobStatus])) {
+              color = _self.dispatchJobInfo.colors[v.jobStatus];
+            }
+            _self.overlays.push(_self.drawDispatchesOutages(v, center, color, 0.5, 1, v.customerQty));
         });
-        
+
         _self.displayMetrics(data);
     },
-    
+
     drawBoundary: function(boundary, districtOutage, paths, color, opacity, strokeWeight) {
         var _self = this;
         var polygon = new google.maps.Polygon({
@@ -103,7 +117,7 @@ OutageMap.prototype = {
           fillOpacity: opacity,
           map: _self.map
         });
-        
+
         if (!_.isUndefined(districtOutage)) {
             var content = "<h5>"+ boundary.name +"</h5><div>";
             if (districtOutage.incidents) {
@@ -112,12 +126,12 @@ OutageMap.prototype = {
             if (districtOutage.customersAffected) {
                 content += "<div><label>Customers affected</label> "+ districtOutage.customersAffected +"</div>";
             }
-            
+
             var bounds = new google.maps.LatLngBounds();
             _.each(paths, function(v) {
                 bounds.extend(v);
             });
-            
+
             var mapLabel = new MapLabel({
                 text: boundary.name,
                 position: bounds.getCenter(),
@@ -125,13 +139,13 @@ OutageMap.prototype = {
                 fontSize: 12,
                 align: 'right'
             });
-            
+
             _self.overlays.push(mapLabel);
         }
-        
+
         return polygon;
     },
-    
+
     drawDispatchesOutages: function(dispatch, center, color, opacity, strokeWeight, numberOfOutages) {
         var _self = this;
         if (numberOfOutages < 10) { numberOfOutages = 10; }
@@ -146,15 +160,19 @@ OutageMap.prototype = {
             center: center,
             radius: radius
           });
-          
-        var content = "<h5>Outage Info</h5><div><label>Job Status:</label> "+ dispatch.jobStatus +"</div>"+
+
+          var jobStatus = dispatch.jobStatus;
+          if (!_.isUndefined(_self.dispatchJobInfo.userFriendlyName[dispatch.jobStatus])) {
+            jobStatus = _self.dispatchJobInfo.userFriendlyName[dispatch.jobStatus];
+          }
+        var content = "<h5>Outage Info</h5><div><label>Job Status:</label> "+ jobStatus +"</div>"+
                 "<div><label>Crew dispatched:</label> "+ dispatch.crewQty +"</div>"+
                 "<div><label>Customers affected</label> "+ dispatch.customerQty +"</div>";
 
         _self.addInfowindow(circle, content, circle.getCenter());
         return circle;
     },
-    
+
     addInfowindow: function(object, content, position) {
         var _self = this;
         var infoWindow = new google.maps.InfoWindow({
@@ -162,7 +180,7 @@ OutageMap.prototype = {
         });
         var openTimeout = null;
         var closeTimeout = null;
-        
+
         object.addListener('mouseover', function () {
             if (!_.isNull(openTimeout)) {
                 clearTimeout(openTimeout);
@@ -177,47 +195,70 @@ OutageMap.prototype = {
                 infoWindow.open(_self.map, object);
                 infoWindow.setPosition(position);
             }, 500);
-            
+
         });
-        
+
         object.addListener('mouseout', function() {
             if (!_.isNull(closeTimeout)) {
                 clearTimeout(closeTimeout);
             }
-            closeTimeout = setTimeout(function() { 
+            closeTimeout = setTimeout(function() {
                 infoWindow.close();
             }, 1000);
         });
-        
+
         //add infowindows to the global space for management
         _self.infowindows.push(infoWindow);
 
     },
-    
+
     displayMetrics: function(data) {
         var _self = this;
         var groupEl = null;
         _self.metricsElement.empty();
-        
+
         groupEl = _self.createAccordionGroup('Global');
         groupEl.find('.metric-body').addClass('show');
-        
+
         _self.addMetricToAccordionGroup(groupEl, 'Current Outages', data.metrics.currentOutages);
         //figure out what this value represents
         //_self.displayMetric('Duration of Outages', data.metrics.durationOutages);
-        _self.addMetricToAccordionGroup(groupEl, 'Auto restored Outages', data.metrics.autoRestoredOutages);
-        _self.addMetricToAccordionGroup(groupEl, 'Prevented Outages', data.metrics.preventedOutages);
-        _self.addMetricToAccordionGroup(groupEl, 'Total smart grid activity', data.metrics.totalSmartGridActivity);
-        
+
         var customersAffected = 0;
         var crewDispatched = 0;
+        var reportedOutages = 0;
+        var outagesRepairInProgress = 0;
+
         _.each(data.dispatches, function(v) {
             customersAffected += v.customerQty;
             crewDispatched += v.crewQty;
+            switch (v.jobStatus) {
+              case 'OUTAGE_REPORTED':
+                reportedOutages++;
+                break;
+              case 'REPAIR_IN_PROGRESS':
+                outagesRepairInProgress++;
+                break;
+              }
         });
+
+        _self.addMetricToAccordionGroup(groupEl, 'Reported Outages', reportedOutages);
+        _self.addMetricToAccordionGroup(groupEl, 'Repair in Progresses', outagesRepairInProgress);
         _self.addMetricToAccordionGroup(groupEl, 'Customers Affected', customersAffected);
         _self.addMetricToAccordionGroup(groupEl, 'Crew Dispatched', crewDispatched);
-        
+
+        _self.addMetricToAccordionGroup(groupEl,
+          'Smart Grid Restores <small class="text-muted">(last 24 hours)</small>',
+          data.metrics.smartGridRestores, true);
+          _self.addMetricToAccordionGroup(groupEl,
+            'Manual Restores <small class="text-muted">(last 24 hours)</small>',
+            data.metrics.manualRestores, true);
+        _self.addMetricToAccordionGroup(groupEl, 'Prevented Outages', data.metrics.preventedOutages, true);
+        _self.addMetricToAccordionGroup(groupEl, 'Auto restored Outages', data.metrics.autoRestoredOutages, true);
+        _self.addMetricToAccordionGroup(groupEl, 'Prevented Outages', data.metrics.preventedOutages, true);
+        _self.addMetricToAccordionGroup(groupEl, 'Total smart grid activity', data.metrics.totalSmartGridActivity, true);
+
+
         var districtOutages = _.sortBy(data.districtOutages, 'name');
         _.each(districtOutages, function(v) {
             var disable = true;
@@ -235,24 +276,26 @@ OutageMap.prototype = {
                 //groupEl.find('.metric-title').attr('href', '').addClass('disabled');
             }
         });
-        
-        
+
+
     },
-    
+
     createAccordionGroup: function(title) {
         var _self = this;
         var el = _self.metricsTemplate.clone();
         var id = 't' +(title +'_'+ (Math.floor(Math.random() * 10000))).hashCode();
-        
+
         el.find('.metric-title').attr('href', '#'+id).text(title);
         el.find('.metric-body').attr('id', id);
         _self.metricsElement.append(el);
-        
+
         return el;
     },
-    
-    addMetricToAccordionGroup: function(groupEl, label, value) {
+
+    addMetricToAccordionGroup: function(groupEl, label, value, displayIfNotNull) {
         var _self = this;
-        groupEl.find('table > tbody').append('<tr><th>'+ label +'</th><td>'+ value +'</td></tr>');
+        if (!displayIfNotNull || (displayIfNotNull && !_.isNull(value))) {
+          groupEl.find('table > tbody').append('<tr><th>'+ label +'</th><td>'+ value +'</td></tr>');
+        }
     }
 };
