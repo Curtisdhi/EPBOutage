@@ -28,6 +28,7 @@ OutageMap.prototype = {
     init: function() {
         var _self = this;
         _self.initialized = true;
+        _self.numberFormater = new Intl.NumberFormat();
     },
 
     load: function() {
@@ -167,8 +168,8 @@ OutageMap.prototype = {
             jobStatus = _self.dispatchJobInfo.userFriendlyName[dispatch.jobStatus];
           }
         var content = "<h5>Outage Info</h5><div><label>Job Status:</label> "+ jobStatus +"</div>"+
-                "<div><label>Crew dispatched:</label> "+ dispatch.crewQty +"</div>"+
-                "<div><label>Customers affected</label> "+ dispatch.customerQty +"</div>";
+                "<div><label>Crew dispatched:</label> "+ _self.numberFormater.format(dispatch.crewQty) +"</div>"+
+                "<div><label>Customers affected</label> "+ _self.numberFormater.format(dispatch.customerQty) +"</div>";
 
         _self.addInfowindow(circle, content, circle.getCenter());
         return circle;
@@ -221,7 +222,7 @@ OutageMap.prototype = {
         groupEl = _self.createAccordionGroup('Global');
         groupEl.find('.metric-body').addClass('show');
 
-        _self.addMetricToAccordionGroup(groupEl, 'Current Outages', data.metrics.currentOutages);
+        _self.addMetricToAccordionGroup(groupEl, 'Current Outages', _self.numberFormater.format(data.metrics.currentOutages));
         //figure out what this value represents
         //_self.displayMetric('Duration of Outages', data.metrics.durationOutages);
 
@@ -243,21 +244,21 @@ OutageMap.prototype = {
               }
         });
 
-        _self.addMetricToAccordionGroup(groupEl, 'Reported Outages', reportedOutages);
-        _self.addMetricToAccordionGroup(groupEl, 'Repair in Progresses', outagesRepairInProgress);
-        _self.addMetricToAccordionGroup(groupEl, 'Customers Affected', customersAffected);
-        _self.addMetricToAccordionGroup(groupEl, 'Crew Dispatched', crewDispatched);
+        _self.addMetricToAccordionGroup(groupEl, 'Reported Outages', _self.numberFormater.format(reportedOutages));
+        _self.addMetricToAccordionGroup(groupEl, 'Repair in Progresses', _self.numberFormater.format(outagesRepairInProgress));
+        _self.addMetricToAccordionGroup(groupEl, 'Customers Affected', _self.numberFormater.format(customersAffected));
+        _self.addMetricToAccordionGroup(groupEl, 'Crew Dispatched', _self.numberFormater.format(crewDispatched));
 
         _self.addMetricToAccordionGroup(groupEl,
           'Smart Grid Restores <small class="text-muted">(last 24 hours)</small>',
-          data.metrics.smartGridRestores, true);
+            _self.numberFormater.format(data.metrics.smartGridRestores), true);
           _self.addMetricToAccordionGroup(groupEl,
             'Manual Restores <small class="text-muted">(last 24 hours)</small>',
-            data.metrics.manualRestores, true);
-        _self.addMetricToAccordionGroup(groupEl, 'Prevented Outages', data.metrics.preventedOutages, true);
-        _self.addMetricToAccordionGroup(groupEl, 'Auto restored Outages', data.metrics.autoRestoredOutages, true);
-        _self.addMetricToAccordionGroup(groupEl, 'Prevented Outages', data.metrics.preventedOutages, true);
-        _self.addMetricToAccordionGroup(groupEl, 'Total smart grid activity', data.metrics.totalSmartGridActivity, true);
+            _self.numberFormater.format(data.metrics.manualRestores), true);
+        _self.addMetricToAccordionGroup(groupEl, 'Prevented Outages', _self.numberFormater.format(data.metrics.preventedOutages), true);
+        _self.addMetricToAccordionGroup(groupEl, 'Auto restored Outages', _self.numberFormater.format(data.metrics.autoRestoredOutages), true);
+        _self.addMetricToAccordionGroup(groupEl, 'Prevented Outages', _self.numberFormater.format(data.metrics.preventedOutages), true);
+        _self.addMetricToAccordionGroup(groupEl, 'Total smart grid activity', _self.numberFormater.format(data.metrics.totalSmartGridActivity), true);
 
 
         var districtOutages = _.sortBy(data.districtOutages, 'name');
@@ -265,11 +266,11 @@ OutageMap.prototype = {
             var disable = true;
             groupEl = _self.createAccordionGroup(v.name);
             if (v.incidents) {
-                _self.addMetricToAccordionGroup(groupEl, 'Incidents', v.incidents);
+                _self.addMetricToAccordionGroup(groupEl, 'Incidents', _self.numberFormater.format(v.incidents));
                 disable = false;
             }
             if (v.customersAffected) {
-                _self.addMetricToAccordionGroup(groupEl, 'Customers Affected', v.customersAffected);
+                _self.addMetricToAccordionGroup(groupEl, 'Customers Affected', _self.numberFormater.format(v.customersAffected));
                 disable = false;
             }
             if (disable) {
