@@ -16,11 +16,12 @@
         <div class="col-md-12 col-lg-10">
             <div class="map-body">
                 <div class="form-group">
+                    {#{ dump(latestOutages) }#}
                     <select class="form-control" name="outage-picker" style="display: inline-block;">
                         {% for outage in latestOutages %}
                             {% set selected = outage._id|trim == selectedOutage %}
                             <option value="{{ outage._id }}" {% if selected %}selected="selected"{% endif %}>
-                                {{ outage.updatedOnFormatted }} ({{ outage.metrics.currentOutages|number_format }} outages)
+                                {{ outage.createdOnFormatted }} ({{ outage.metrics.customersAffected|number_format }}  affected)
                             </option>
                         {% endfor %}
                     </select>
@@ -50,7 +51,7 @@
                         <select class="form-control" name="majorOutage">
                             <option selected="selected">Select an outage to display</option>
                             {% for m in majorOutages %}
-                                <option value="{{ m._id }}">{{ m.updatedOn.sec|date('M d, Y') }} ({{ m.metrics.currentOutages|number_format }} outages)</option>
+                                <option value="{{ m._id }}">{{ m.createdOn.sec|date('M d, Y') }} ({{ m.metrics.customersAffected|number_format }} customers affected)</option>
                             {% endfor %}
                         </select>
                     </div>

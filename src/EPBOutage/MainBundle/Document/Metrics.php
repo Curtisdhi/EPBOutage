@@ -13,6 +13,12 @@ class Metrics implements \JsonSerializable
     
     /** @Mongo\Field(type="integer") */
     protected $currentOutages;
+    
+    /** @Mongo\Field(type="integer") */
+    protected $customersAffected;
+    
+    /** @Mongo\Field(type="integer") */
+    protected $crewDispatched;
             
     /** @Mongo\Field(type="integer") */
     protected $durationOutages;
@@ -117,11 +123,30 @@ class Metrics implements \JsonSerializable
         $this->endDtTm = $endDtTm;
         return $this;
     }
+    
+    function getCustomersAffected() {
+        return $this->customersAffected;
+    }
 
+    function setCustomersAffected($customersAffected) {
+        $this->customersAffected = $customersAffected;
+    }
+    
+    function getCrewDispatched() {
+        return $this->crewDispatched;
+    }
+
+    function setCrewDispatched($crewDispatched) {
+        $this->crewDispatched = $crewDispatched;
+    }
+
+    
     public function jsonSerialize() {
         return array(
             'autoRestoredOutages' => $this->getAutoRestoredOutages(),
             'currentOutages' => $this->getCurrentOutages(),
+            'customersAffected' => $this->getCustomersAffected(),
+            'crewDispatched' => $this->getCrewDispatched(),
             'durationOutages' => $this->getDurationOutages(),
             'preventedOutages' => $this->getPreventedOutages(),
             'smartGridRestores' => $this->getSmartGridRestores(),

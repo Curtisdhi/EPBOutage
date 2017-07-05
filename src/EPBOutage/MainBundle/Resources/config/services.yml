@@ -5,3 +5,7 @@ services:
     epboutage.outage_importer:
         class: EPBOutage\MainBundle\Import\OutageImporter
         arguments: [@doctrine_mongodb.odm.document_manager]
+        
+    epboutage.old_outage_importer:
+        class: EPBOutage\MainBundle\Import\OldOutageImporter
+        arguments: [@doctrine_mongodb.odm.document_manager]

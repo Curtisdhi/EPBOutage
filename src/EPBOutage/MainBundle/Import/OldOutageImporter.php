@@ -5,9 +5,12 @@ namespace EPBOutage\MainBundle\Import;
 use Doctrine\Common\Persistence\ObjectManager;
 use EPBOutage\MainBundle\Document as Document;
 
-class OutageImporter {
+class OldOutageImporter {
     
+    const IMPORTER_VERSION = '1.0.0';
     private $objectManager;
+    
+    private $outage;
     
     public function __construct(ObjectManager $objectManager) {
         $this->objectManager = $objectManager;
@@ -16,6 +19,10 @@ class OutageImporter {
     public function importFromJsonString($outageJsonString) {
         $json = json_decode($outageJsonString, true);
         $outage = new Document\Outage();
+        $this->outage = $outage;
+        
+        $outage->setImporterVersion(self::IMPORTER_VERSION);
+        
         $m = $this->createDistrictOutages($json['districtOutages']);
         $outage->setDistrictOutages($m['districtOutages']);
         $outage->setBoundaries($m['boundaries']);
@@ -25,6 +32,29 @@ class OutageImporter {
         
         $this->objectManager->persist($outage);
         $this->objectManager->flush();
+    }
+    
+    public function rebuildFromExisting($outage) {
+        $this->outage = $outage;
+        $outage->setImporterVersion(self::IMPORTER_VERSION);
+        
+        $jsonApi = $outage->getFullJson();
+        if (!is_array($jsonApi)) {
+            //remember to decode because the old version didn't use a hash
+            $outage->setFullJson(null, array())
+                ->setFullJson('old_outages', $jsonApi);
+            $jsonApi = array('old_outages' => $jsonApi);
+        } 
+        $json = json_decode($jsonApi['old_outages'], true);
+        
+        $m = $this->createDistrictOutages($json['districtOutages']);
+        $outage->setDistrictOutages($m['districtOutages']);
+        $outage->setBoundaries($m['boundaries']);
+        $outage->setMetrics($this->createMetrics($json['metrics']));
+        $outage->setDispatches($this->createDispatches($json['outages']));
+
+        $this->objectManager->persist($outage);
+        
     }
     
     public function createDistrictOutages($districtOutages) {
@@ -61,6 +91,16 @@ class OutageImporter {
         $docMetrics->setDurationOutages($this->getVal('durationOutages', $metrics));
         $docMetrics->setPreventedOutages($this->getVal('preventedOutages', $metrics));
         $docMetrics->setTotalSmartGridActivity($this->getVal('totalSmartGridActivity', $metrics));
+        
+        $currentOutages = 0;
+        $customersAffected = 0;
+        foreach ($this->outage->getDistrictOutages() as $districtOutage) {
+            $currentOutages += $districtOutage->getIncidents();
+            $customersAffected += $districtOutage->getCustomersAffected();
+        }
+        
+        $docMetrics->setCurrentOutages($currentOutages);
+        $docMetrics->setCustomersAffected($customersAffected);
         
         return $docMetrics;
     }

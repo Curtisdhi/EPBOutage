@@ -222,17 +222,14 @@ OutageMap.prototype = {
         groupEl = _self.createAccordionGroup('Global');
         groupEl.find('.metric-body').addClass('show');
 
-        _self.addMetricToAccordionGroup(groupEl, 'Current Outages', _self.numberFormater.format(data.metrics.currentOutages));
+        _self.addMetricToAccordionGroup(groupEl, 'Current Incidents', _self.numberFormater.format(data.metrics.currentOutages));
         //figure out what this value represents
         //_self.displayMetric('Duration of Outages', data.metrics.durationOutages);
 
-        var customersAffected = 0;
-        var crewDispatched = 0;
         var reportedOutages = 0;
         var outagesRepairInProgress = 0;
 
         _.each(data.dispatches, function(v) {
-            customersAffected += v.customerQty;
             crewDispatched += v.crewQty;
             switch (v.jobStatus) {
               case 'OUTAGE_REPORTED':
@@ -244,10 +241,10 @@ OutageMap.prototype = {
               }
         });
 
-        _self.addMetricToAccordionGroup(groupEl, 'Reported Outages', _self.numberFormater.format(reportedOutages));
+        _self.addMetricToAccordionGroup(groupEl, 'Reported Incidents', _self.numberFormater.format(reportedOutages));
         _self.addMetricToAccordionGroup(groupEl, 'Repair in Progresses', _self.numberFormater.format(outagesRepairInProgress));
-        _self.addMetricToAccordionGroup(groupEl, 'Customers Affected', _self.numberFormater.format(customersAffected));
-        _self.addMetricToAccordionGroup(groupEl, 'Crew Dispatched', _self.numberFormater.format(crewDispatched));
+        _self.addMetricToAccordionGroup(groupEl, 'Customers Affected', _self.numberFormater.format(data.metrics.customersAffected));
+        _self.addMetricToAccordionGroup(groupEl, 'Crew Dispatched', _self.numberFormater.format(data.metrics.crewDispatched));
 
         _self.addMetricToAccordionGroup(groupEl,
           'Smart Grid Restores <small class="text-muted">(last 24 hours)</small>',
@@ -257,7 +254,6 @@ OutageMap.prototype = {
             _self.numberFormater.format(data.metrics.manualRestores), true);
         _self.addMetricToAccordionGroup(groupEl, 'Prevented Outages', _self.numberFormater.format(data.metrics.preventedOutages), true);
         _self.addMetricToAccordionGroup(groupEl, 'Auto restored Outages', _self.numberFormater.format(data.metrics.autoRestoredOutages), true);
-        _self.addMetricToAccordionGroup(groupEl, 'Prevented Outages', _self.numberFormater.format(data.metrics.preventedOutages), true);
         _self.addMetricToAccordionGroup(groupEl, 'Total smart grid activity', _self.numberFormater.format(data.metrics.totalSmartGridActivity), true);
 
 

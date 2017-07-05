@@ -103,7 +103,7 @@ class DefaultController extends Controller
         } 
         
         if (!$latestOutages) {
-            $latestOutages = $repo->findLatestWithIdAndUpdatedDate(24, $startDate);
+            $latestOutages = $repo->findLatestWithIdAndCreatedDate(24, $startDate);
             reset($latestOutages);
             if ($hasStartDate) {
                 $o = end($latestOutages);
@@ -116,7 +116,7 @@ class DefaultController extends Controller
         $majorOutages = $repo->findMajorOutages(1000);
         
         foreach ($latestOutages as $key => $outage) {
-            $latestOutages[$key]['updatedOnFormatted'] = $latestOutages[$key]['updatedOn']->toDateTime()
+            $latestOutages[$key]['createdOnFormatted'] = $latestOutages[$key]['createdOn']->toDateTime()
                     ->setTimezone(new \DateTimeZone(date_default_timezone_get()))->format('M d, Y H:i');
         }
         

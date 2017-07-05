@@ -15,6 +15,9 @@ class Outage implements \JsonSerializable
      */
     protected $id;
     
+    /** @Mongo\Field(type="string") */
+    protected $importerVersion;
+    
      /** @Mongo\EmbedOne(targetDocument="EPBOutage\MainBundle\Document\Metrics") */
     protected $metrics;
     
@@ -30,16 +33,32 @@ class Outage implements \JsonSerializable
      /**
      * @var datetime $updated
      *
-     * @Gedmo\Timestampable
+     * @Gedmo\Timestampable(on="update")
      * @Mongo\Field(type="date")
      */
     protected $updatedOn;  
+    
+    /**
+     * @var datetime $updated
+     *
+     * @Gedmo\Timestampable(on="create")
+     * @Mongo\Field(type="date")
+     */
+    protected $createdOn;  
     
     /** @Mongo\Field(type="hash") */
     protected $fullJson = array();
 
     public function __construct() {
         
+    }
+    
+    function getImporterVersion() {
+        return $this->importerVersion;
+    }
+
+    function setImporterVersion($importerVersion) {
+        $this->importerVersion = $importerVersion;
     }
 
     public function getId() {
@@ -83,11 +102,13 @@ class Outage implements \JsonSerializable
     }
 
     public function setFullJson($key, $fullJson) {
-        $this->fullJson[$key] = $fullJson;
+        if ($key === null) {
+            $this->fullJson = $fullJson;
+        } else {
+            $this->fullJson[$key] = $fullJson;
+        }
         return $this;
     }
-   
-
 
     public function getBoundaries() {
         return $this->boundaries;
@@ -105,6 +126,14 @@ class Outage implements \JsonSerializable
     public function setUpdated(\Datetime $updatedOn) {
         $this->updatedOn = $updatedOn;
         return $this;
+    }
+    
+    function getCreatedOn() {
+        return $this->createdOn;
+    }
+
+    function setCreatedOn(datetime $createdOn) {
+        $this->createdOn = $createdOn;
     }
 
     public function jsonSerialize() {
