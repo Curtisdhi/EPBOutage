@@ -230,7 +230,6 @@ OutageMap.prototype = {
         var outagesRepairInProgress = 0;
 
         _.each(data.dispatches, function(v) {
-            crewDispatched += v.crewQty;
             switch (v.jobStatus) {
               case 'OUTAGE_REPORTED':
                 reportedOutages++;
@@ -247,10 +246,10 @@ OutageMap.prototype = {
         _self.addMetricToAccordionGroup(groupEl, 'Crew Dispatched', _self.numberFormater.format(data.metrics.crewDispatched));
 
         _self.addMetricToAccordionGroup(groupEl,
-          'Smart Grid Restores <small class="text-muted">(last 24 hours)</small>',
+          'Smart Grid Restores<br> <small class="text-muted">(last 24 hours)</small>',
             _self.numberFormater.format(data.metrics.smartGridRestores), true);
           _self.addMetricToAccordionGroup(groupEl,
-            'Manual Restores <small class="text-muted">(last 24 hours)</small>',
+            'Manual Restores<br> <small class="text-muted">(last 24 hours)</small>',
             _self.numberFormater.format(data.metrics.manualRestores), true);
         _self.addMetricToAccordionGroup(groupEl, 'Prevented Outages', _self.numberFormater.format(data.metrics.preventedOutages), true);
         _self.addMetricToAccordionGroup(groupEl, 'Auto restored Outages', _self.numberFormater.format(data.metrics.autoRestoredOutages), true);
