@@ -11,6 +11,7 @@ function OutageMap(mapElement,metricsElement, zoom, centerLocation) {
     this.metricsTemplate = metricsElement.find('.metric-template').clone();
     this.overlays = [];
     this.metricsTemplate.removeClass('metric-template hide');
+    this.boundaryColor = '#3494d3';
     this.dispatchJobInfo = {
       colors: {
         DEFAULT: '#FF0000',
@@ -93,8 +94,8 @@ OutageMap.prototype = {
         var _self = this;
         _self.data = data;
         _.each(data.boundaries, function(v) {
-            var districtOutage = _.find(data.districtOutages, function(o) { return v.name === o.name });
-            _self.overlays.push(_self.drawBoundary(v, districtOutage, v.latLng, '#3494d3', 0.2, 1));
+            var districtOutage = _.find(data.districtOutages, function(o) { return v.name === o.name; });
+            _self.overlays.push(_self.drawBoundary(v, districtOutage, v.latLng, _self.boundaryColor, 0.2, 1));
         });
         _.each(data.dispatches, function(v) {
             var center = {lat: parseFloat(v.latitude), lng: parseFloat(v.longitude)};
@@ -121,14 +122,6 @@ OutageMap.prototype = {
         });
 
         if (!_.isUndefined(districtOutage)) {
-            var content = "<h5>"+ boundary.name +"</h5><div>";
-            if (districtOutage.incidents) {
-                content += "<div><label>Incidents:</label> "+ districtOutage.incidents +"</div>";
-            }
-            if (districtOutage.customersAffected) {
-                content += "<div><label>Customers affected</label> "+ districtOutage.customersAffected +"</div>";
-            }
-
             var bounds = new google.maps.LatLngBounds();
             _.each(paths, function(v) {
                 bounds.extend(v);
