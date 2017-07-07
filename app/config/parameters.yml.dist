@@ -13,7 +13,7 @@ parameters:
     database_user:     root
     database_password: ~
 
-    mongo_database_name: epboutage
+    mongo_database_name: REPLACE_ME
     mongo_database_server: mongodb://localhost:27017
 
     mongo.session.options:
@@ -24,13 +24,13 @@ parameters:
     # database_path: "%kernel.root_dir%/data.db3"
 
     mailer_transport: smtp
-    mailer_host: smtp.mailgun.org
-    mailer_port: 587
+    mailer_host: REPLACE_ME
+    mailer_port: REPLACE_ME
     mailer_sender: no-reply@epboutage.info
-    mailer_user: postmaster@epboutage.info
-    mailer_password: '27e3b22ef1ca0811afcd2beb054d3ee0'
+    mailer_user: REPLACE_ME
+    mailer_password: REPLACE_ME
     mailer_encryption: tls
-    mailer_recevier: demo@demo.com
+    mailer_recevier: REPLACE_ME
     mailer_noreply: noreply@epboutage.info
     locale: en
     # en: en
@@ -44,8 +44,8 @@ parameters:
         mobile_detail_boundaries: https://api.epb.com/mobile/android/v1/outages/boundaries
         mobile_detail_incidents: https://api.epb.com/mobile/android/v1/outages/incidents
         #website_old_outages: https://epb.com/api/v3/outages
-    google_analytics_key: UA-52303307-5
-    google_api_key: AIzaSyCfImfU_gTKRQro0FsbIBz4iyMX2hef9JM
+    google_analytics_key: REPLACE_ME
+    google_api_key: REPLACE_ME
     google_map:
         zoom: 10
         center_location: 
