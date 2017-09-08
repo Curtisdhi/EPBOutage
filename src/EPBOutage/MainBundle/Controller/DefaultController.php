@@ -93,7 +93,17 @@ class DefaultController extends Controller
         if (!is_null($startDate)) {
             $startDate = (new \Datetime())->setTimestamp($startDate);
             $hasStartDate = true;
+        } else {
+            $currentOutage = $repo->findCurrentOutage();
+            \Symfony\Component\VarDumper\VarDumper::dump($currentOutage);
+            if ($currentOutage) {
+                $startDate = $currentOutage->getCreatedOn();
+            } else {
+                $startDate = new \DateTime();
+            }
         }
+        $endDate = null;
+        //$endDate = $startDate->modify('+24hours');
         
         if ($id !== 0) {
             $latestOutages = $repo->findLatestNearId(24, $id);
@@ -103,7 +113,7 @@ class DefaultController extends Controller
         } 
         
         if (!$latestOutages) {
-            $latestOutages = $repo->findLatestWithIdAndCreatedDate(24, $startDate);
+            $latestOutages = $repo->findWithinTimeRange($startDate, $endDate);
             reset($latestOutages);
             if ($hasStartDate) {
                 $o = end($latestOutages);
@@ -113,8 +123,8 @@ class DefaultController extends Controller
             }
             $selectedOutage = $o['_id'];
         }
-        $majorOutages = $repo->findMajorOutages(
-                $this->getContainer()->getParameter('threshold.major_outages.customers_affected'));
+        $thresholds = $this->getParameter('thresholds');
+        $majorOutages = $repo->findMajorOutages($thresholds['major_outages']['customers_affected']);
         
         foreach ($latestOutages as $key => $outage) {
             $latestOutages[$key]['createdOnFormatted'] = $latestOutages[$key]['createdOn']->toDateTime()

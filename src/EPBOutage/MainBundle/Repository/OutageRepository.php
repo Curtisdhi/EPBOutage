@@ -13,6 +13,28 @@ class OutageRepository extends DocumentRepository {
         return $qb->getQuery()->getSingleResult();
     }
     
+    public function findWithinTimeRange($startDate, $endDate, $limit = 24) {
+        $qb = $this->dm->createQueryBuilder('EPBOutageMainBundle:Outage')
+            ->select('createdOn', 'metrics.customersAffected')
+            ->sort('createdOn', 'desc');
+        $useLimit = true;
+        
+        if (!is_null($startDate) && $startDate instanceof \DateTime) {
+            $qb->field('createdOn')->lte($startDate);
+        } 
+        
+        if (!is_null($endDate) && $endDate instanceof \DateTime) {
+            $qb->field('createdOn')->gte($endDate);
+            $useLimit = false;
+        } 
+        
+        if ($useLimit) {
+            $qb->limit($limit);
+        }
+        
+        return $qb->hydrate(false)->getQuery()->execute()->toArray();
+    }
+    
     public function findLatestNearId($limit, $id) {
         $qb = $this->dm->createQueryBuilder('EPBOutageMainBundle:Outage')
             ->select('createdOn')

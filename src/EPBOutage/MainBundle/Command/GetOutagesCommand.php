@@ -39,7 +39,8 @@ class GetOutagesCommand extends ContainerAwareCommand
         $importer->importFromJsonApiArray($jsonApi);
         
         if ($input->getOption('use-realtime-threshold')) {
-            $customersAffectedThreshold = $this->getContainer()->getParameter('threshold.major_outages.customers_affected');
+            $thresholds = $this->getContainer()->getParameter('thresholds');
+            $customersAffectedThreshold = $thresholds['major_outages']['customers_affected'];
             if ($importer->getObject()->getMetrics()->getCustomersAffected() >= $customersAffectedThreshold) {
                 $importer->flush();
             }
