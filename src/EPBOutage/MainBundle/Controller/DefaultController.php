@@ -113,7 +113,8 @@ class DefaultController extends Controller
             }
             $selectedOutage = $o['_id'];
         }
-        $majorOutages = $repo->findMajorOutages(1000);
+        $majorOutages = $repo->findMajorOutages(
+                $this->getContainer()->getParameter('threshold.major_outages.customers_affected'));
         
         foreach ($latestOutages as $key => $outage) {
             $latestOutages[$key]['createdOnFormatted'] = $latestOutages[$key]['createdOn']->toDateTime()

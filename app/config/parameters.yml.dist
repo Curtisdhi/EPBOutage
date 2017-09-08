@@ -51,3 +51,6 @@ parameters:
         center_location: 
             lat: 35.117331
             lng: -85.249493
+    thresholds:
+        major_outages:
+            customers_affected: 1000

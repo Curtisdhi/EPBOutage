@@ -14,7 +14,14 @@ class GetOutagesCommand extends ContainerAwareCommand
         ->setName('epboutage:getOutages')
 
         // the short description shown while running "php bin/console list"
-        ->setDescription('Gets outages and stores them in the database');
+        ->setDescription('Gets outages and stores them in the database')
+        ->addOption(
+            'use-realtime-threshold',
+            null,
+            InputOption::VALUE_NONE,
+            'If enabled, will add if customers affected are over theshold',
+            1
+        );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -28,7 +35,17 @@ class GetOutagesCommand extends ContainerAwareCommand
         }
         
         $output->writeln('Parsing outages');
-        $this->getContainer()->get('epboutage.outage_importer')->importFromJsonApiArray($jsonApi);
+        $importer = $this->getContainer()->get('epboutage.outage_importer');
+        $importer->importFromJsonApiArray($jsonApi);
+        
+        if ($input->getOption('use-realtime-threshold')) {
+            $customersAffectedThreshold = $this->getContainer()->getParameter('threshold.major_outages.customers_affected');
+            if ($importer->getObject()->getMetrics()->getCustomersAffected() >= $customersAffectedThreshold) {
+                $importer->flush();
+            }
+        } else {
+            $importer->flush();
+        }
         
         $output->writeln('Finished');
         
