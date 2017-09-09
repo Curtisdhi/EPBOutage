@@ -6,8 +6,7 @@ use Doctrine\Common\Persistence\ObjectManager;
 
 abstract class Importer {
     
-    private $objectManager;
-    
+    protected $objectManager;
     protected $object;
     
     public function __construct(ObjectManager $objectManager) {

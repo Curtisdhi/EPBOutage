@@ -7,20 +7,21 @@ use EPBOutage\MainBundle\Document as Document;
 
 class IncidentsImporter extends Importer {
     
-    private $objectManager;
     private $outage;
     
     public function __construct(ObjectManager $objectManager, Document\Outage $outage) {
-        $this->objectManager = $objectManager;
+        parent::__construct($objectManager);
         $this->outage = $outage;
     }
     
     public function importFromJsonString($incidentsJsonString) {
         $json = json_decode($incidentsJsonString, true);
         
-        $this->outage->setDispatches($this->createDispatches($json['incidents']));
-        
-        $this->outage->setDistrictOutages($this->createDistrictOutages($json['metrics']));
+        if ($json) {
+            $this->outage->setDispatches($this->createDispatches($json['incidents']));
+
+            $this->outage->setDistrictOutages($this->createDistrictOutages($json['metrics']));
+        }
         $this->outage->setFullJson('incidents', $incidentsJsonString);
     }
     

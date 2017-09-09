@@ -43,6 +43,8 @@ class GetOutagesCommand extends ContainerAwareCommand
             $customersAffectedThreshold = $thresholds['major_outages']['customers_affected'];
             if ($importer->getObject()->getMetrics()->getCustomersAffected() >= $customersAffectedThreshold) {
                 $importer->flush();
+            } else {
+                $output->writeln('Nothing to see here.');
             }
         } else {
             $importer->flush();

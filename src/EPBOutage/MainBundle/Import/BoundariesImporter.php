@@ -7,10 +7,10 @@ use EPBOutage\MainBundle\Document as Document;
 
 class BoundariesImporter extends Importer {
     
-    private $objectManager;
     private $outage;
     
     public function __construct(ObjectManager $objectManager, Document\Outage $outage) {
+        parent::__construct($objectManager);
         $this->outage = $outage;
     }
     

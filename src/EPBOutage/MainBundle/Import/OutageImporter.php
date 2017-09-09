@@ -8,10 +8,9 @@ use EPBOutage\MainBundle\Document as Document;
 class OutageImporter extends Importer {
     
     const IMPORTER_VERSION = '2.0.0';
-    private $objectManager;
     
     public function __construct(ObjectManager $objectManager) {
-        $this->objectManager = $objectManager;
+        parent::__construct($objectManager);
     }
     
     public function importFromJsonString($outageJsonString) { 
@@ -71,5 +70,5 @@ class OutageImporter extends Importer {
         $this->objectManager->persist($outage);
         
     }
-    
+
 }
