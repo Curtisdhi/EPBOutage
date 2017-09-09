@@ -42,29 +42,12 @@ class OutageRepository extends DocumentRepository {
         $outage = $qb->hydrate(false)->getQuery()->getSingleResult();
         $latestOutages = null;
         if ($outage) {
-            $latestOutages = $this->findLatestWithIdAndCreatedDate($limit, $outage['createdOn']->toDateTime()->modify('-24 hours'));
+            $startDate = $outage['createdOn']->toDateTime();
+            $latestOutages = $this->findWithinTimeRange($startDate, (new \DateTime($startDate->format('Y-m-d H:i:sP')))->modify('-24 hours'));
         }
         return $latestOutages;
     }
-    
-    public function findLatestWithIdAndCreatedDate($limit = 1, $startDate = null) {
-        $qb = $this->dm->createQueryBuilder('EPBOutageMainBundle:Outage')
-            ->select('createdOn', 'metrics.customersAffected')
-            ->limit($limit);
-        $reverse = false;
-        
-        if (!is_null($startDate) && $startDate instanceof \DateTime) {
-            $qb->field('createdOn')->gte($startDate)
-                ->sort('createdOn', 'asc');
-        } else {
-            $qb->sort('createdOn', 'desc');
-            $reverse = true;
-        }
-        
-        $results = $qb->hydrate(false)->getQuery()->execute()->toArray();
-        return !$reverse ? array_reverse($results) : $results;
-    }
-    
+
     public function findMajorOutages($minOutages) {
         $qb = $this->dm->createQueryBuilder('EPBOutageMainBundle:Outage')
             ->select('createdOn', 'metrics.customersAffected')

@@ -4,6 +4,7 @@ namespace EPBOutage\MainBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class GetOutagesCommand extends ContainerAwareCommand
@@ -19,8 +20,7 @@ class GetOutagesCommand extends ContainerAwareCommand
             'use-realtime-threshold',
             null,
             InputOption::VALUE_NONE,
-            'If enabled, will add if customers affected are over theshold',
-            1
+            'If enabled, will add if customers affected are over theshold'
         );
     }
 

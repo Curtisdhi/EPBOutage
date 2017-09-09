@@ -90,20 +90,14 @@ class DefaultController extends Controller
         
         $hasStartDate = false;
         $startDate = $request->get('start_date');
+
         if (!is_null($startDate)) {
             $startDate = (new \Datetime())->setTimestamp($startDate);
             $hasStartDate = true;
         } else {
-            $currentOutage = $repo->findCurrentOutage();
-            \Symfony\Component\VarDumper\VarDumper::dump($currentOutage);
-            if ($currentOutage) {
-                $startDate = $currentOutage->getCreatedOn();
-            } else {
-                $startDate = new \DateTime();
-            }
+            $startDate = new \DateTime();
         }
-        $endDate = null;
-        //$endDate = $startDate->modify('+24hours');
+        $endDate = (new \DateTime($startDate->format('Y-m-d H:i:sP')))->modify('-24hours');
         
         if ($id !== 0) {
             $latestOutages = $repo->findLatestNearId(24, $id);
