@@ -1,0 +1,9 @@
+{{ form_start(alertSignupForm) }}
+{{ form_row(alertSignupForm.email) }}
+{{ form_row(alertSignupForm.customersAffectedThreshold) }}
+<div>
+    {{ form_errors(alertSignupForm.recaptcha) }}  
+    {{ form_widget(alertSignupForm.recaptcha) }}  
+</div>
+{{ form_rest(alertSignupForm) }}
+{{ form_end(alertSignupForm) }}

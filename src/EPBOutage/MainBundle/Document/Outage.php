@@ -132,7 +132,7 @@ class Outage implements \JsonSerializable
         return $this->createdOn;
     }
 
-    function setCreatedOn(datetime $createdOn) {
+    function setCreatedOn(\Datetime $createdOn) {
         $this->createdOn = $createdOn;
     }
 

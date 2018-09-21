@@ -10,11 +10,15 @@
 
 {% block content %}
     {% for flashMessage in app.session.flashbag.get('invalid_id') %}
-            <div class="alert alert-danger">{{ flashMessage|raw }}</div>
-        {% endfor %}
+        <div class="alert alert-danger">{{ flashMessage|raw }}</div>
+    {% endfor %}
     <div class="row">
         <div class="col-md-12 col-lg-10">
             <div class="map-body">
+                <div class="pull-right">
+                    <button class="btn btn-primary" data-toggle="modal" data-target="#signup_alert_modal">Sign up for outage alerts</button>
+                </div>
+                
                 <div class="form-group">
                     {#{ dump(latestOutages) }#}
                     <select class="form-control" name="outage-picker" style="display: inline-block;">
@@ -96,4 +100,28 @@
             </div>
         </div>
     </div>
+                  
+<!-- Modal -->
+<div class="modal fade" id="signup_alert_modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Signup for outage alerts</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            </div>
+            <div class="modal-body">
+                <div id="success-msg" class="alert alert-success" style="display:none;">Successfully sign up for outage alerts!</div>
+                <div class="form-body"></div>
+                <br>
+                <p class="alert alert-info">Don't worry, we'll only send an email a maximium of once every 24 hours when an outage reaches the set threshold, and you'll be able to unsubscribe anytime. :)</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="submit_signup">Signup</button>
+                
+            </div>
+        </div>
+    </div>
+</div>      
+                        
 {% endblock %}

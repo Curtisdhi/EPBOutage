@@ -2,6 +2,9 @@
 # Set parameters here that may be different on each deployment target of the app, e.g. development, staging, production.
 # http://symfony.com/doc/current/best_practices/configuration.html#infrastructure-related-configuration
 parameters:
+    router.request_context.host: www.epboutage.info
+    router.request_context.scheme: https
+
     application_name: EPBOutage
     site_name: epboutage.info
     site_url: http://www.epboutage.info
@@ -54,3 +57,4 @@ parameters:
     thresholds:
         major_outages:
             customers_affected: 1000
+        alert_send_delay: PT24H

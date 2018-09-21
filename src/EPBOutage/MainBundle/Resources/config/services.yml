@@ -9,3 +9,7 @@ services:
     epboutage.old_outage_importer:
         class: EPBOutage\MainBundle\Import\OldOutageImporter
         arguments: [@doctrine_mongodb.odm.document_manager]
+        
+    epboutage.alert_sender:
+        class: EPBOutage\MainBundle\Services\AlertSender
+        arguments: [@service_container, @doctrine_mongodb.odm.document_manager, @mailer, @templating]

@@ -124,7 +124,7 @@ class DefaultController extends Controller
             $latestOutages[$key]['createdOnFormatted'] = $latestOutages[$key]['createdOn']->toDateTime()
                     ->setTimezone(new \DateTimeZone(date_default_timezone_get()))->format('M d, Y H:i');
         }
-        
+      
         return array('latestOutages' => $latestOutages,
             'majorOutages' => $majorOutages,
             'selectedOutage' => $selectedOutage,

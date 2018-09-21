@@ -38,19 +38,35 @@ class GetOutagesCommand extends ContainerAwareCommand
         $importer = $this->getContainer()->get('epboutage.outage_importer');
         $importer->importFromJsonApiArray($jsonApi);
         
+        $hasOutageToAlert = false;
+        
         if ($input->getOption('use-realtime-threshold')) {
             $thresholds = $this->getContainer()->getParameter('thresholds');
             $customersAffectedThreshold = $thresholds['major_outages']['customers_affected'];
             if ($importer->getObject()->getMetrics()->getCustomersAffected() >= $customersAffectedThreshold) {
                 $importer->flush();
+                $hasOutageToAlert = true;
             } else {
                 $output->writeln('Nothing to see here.');
             }
         } else {
             $importer->flush();
+            $hasOutageToAlert = true;
+        }
+        
+        if ($hasOutageToAlert) {
+            $alertSender = $this->getContainer()->get('epboutage.alert_sender');
+            try {
+                $alerts = $alertSender->sendAlerts($importer->getObject());
+                $output->writeln('Sent out '. $alerts .' alerts.');
+            } catch (Exception $ex) {
+                $output->writeln('Failed to alert users!');
+                $output->writeln($ex->getMessage());
+            }
         }
         
         $output->writeln('Finished');
         
     }
+    
 }
