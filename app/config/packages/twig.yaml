@@ -1,0 +1,11 @@
+twig:
+    default_path: '%kernel.project_dir%/templates'
+    globals:
+        google_map:
+            api_key: '%env(GOOGLE_MAP_API_KEY)%'
+            zoom: '%env(GOOGLE_MAP_ZOOM)%'
+            center_location: '%env(GOOGLE_MAP_CENTER_LOCATION)%'
+
+when@test:
+    twig:
+        strict_variables: true

@@ -1,0 +1,46 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    {% block topNavBar %}
+        <nav class="navbar navbar-toggleable-md navbar-inverse bg-inverse fixed-top">
+            <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <a class="navbar-brand" href="{{ path('main_index') }}">
+                EPBOutage.info<br>
+                <small class="text-muted" style="font-size:10px;">*Not affiliated with EPB</small>
+            </a>
+
+            <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item active">
+                        <a class="nav-link" href="{{ path('main_index') }}">Home <span class="sr-only">(current)</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ path('about') }}">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://epb.com/outage-map" target="_blank">
+                            Realtime Map
+                            <small class="text-muted">on EPB's website</small>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://epb.com" target="_blank">EPB Homepage</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    {% endblock %}
+    <div class="container-fluid">
+        {% block content %}{% endblock %}
+    </div>
+    <footer class="footer">
+        <div class="container-fluid">
+            {% block footer %}
+            <span class="text-muted">Curtisdhi <i class="fa fa-copyright"></i> 2017-{{ "now"|date("Y") }}</span>
+            {% endblock %}
+        </div>
+    </footer>    
+
+{% endblock %}

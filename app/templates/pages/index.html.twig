@@ -1,0 +1,100 @@
+{% extends 'layout.html.twig' %}
+{% block javascript %}
+    {{ parent() }}
+    <script src="https://maps.googleapis.com/maps/api/js?key={{ google_map.api_key }}"></script>
+{% endblock %}
+
+{% block content %}
+    {% for flashMessage in app.session.flashbag.get('invalid_id') %}
+        <div class="alert alert-danger">{{ flashMessage|raw }}</div>
+    {% endfor %}
+    <div class="row">
+        <div class="col-md-12 col-lg-10">
+            <div class="map-body">
+                <div class="pull-right">
+                    <button class="btn btn-primary" data-toggle="modal" data-target="#signup_alert_modal">Sign up for outage alerts</button>
+                </div>
+                
+                <div class="form-group">
+                    {#{ dump(latestOutages) }#}
+                    <select class="form-control" name="outage-picker" style="display: inline-block;">
+                        {% for outage in latestOutages %}
+                            {% set selected = outage._id|trim == selectedOutage %}
+                            <option value="{{ outage._id }}" {% if selected %}selected="selected"{% endif %}>
+                                {{ outage.createdOnFormatted }} ({{ outage.metrics.customersAffected|number_format }}  affected)
+                            </option>
+                        {% endfor %}
+                    </select>
+                    <label class="hidden-xs-down" style="display: inline-block;">Outages for the past 24 hours</label>
+                </div>
+                <div id="map" data-zoom="{{ google_map.zoom }}" data-center-location="{{ google_map.center_location|json_encode() }}"></div>
+            </div>
+            <br>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Pick a starting date:</label> &nbsp;
+                        <div id="outage-datetime-picker" class="input-group date" data-isset="{{ startDate ? 'true' : 'false' }}">
+                            <span class="input-group-btn">
+                                <a class="btn btn-secondary" href="{{ path('main_index') }}">Reset</a>
+                            </span>
+                            <input type="text" class="form-control" value="{{ startDate|date('M d, Y H:i') }}">
+                            <span class="input-group-addon">
+                                <i class="fa fa-calendar"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-5">
+                    <div class="form-group">
+                        <label>Major outages: <smll class="text-muted">All outages with over 1,000 affected customers.</small></label> &nbsp;
+                        <select class="form-control" name="majorOutage">
+                            <option selected="selected">Select an outage to display</option>
+                            {% for m in majorOutages %}
+                                <option value="{{ m._id }}">{{ m.createdOn.sec|date('M d, Y') }} ({{ m.metrics.customersAffected|number_format }} customers affected)</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="pull-right">
+                        <button type="button" data-href="" class="btn btn-secondary btn-share" title="Copied to your clipboard. Now share with others!">
+                            <i class="fa fa-share-square-o"></i>
+                            Share
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="col-lg-2 metrics-sidebar">
+            <div class="hidden-lg-up">
+                <button type="button" class="btn btn-secondary btn-metrics-toggler">
+                    <i class="fa fa-bars"></i>
+                    Metrics
+                </button>
+            </div>
+            <div class="metrics">
+                <h3 class="hidden-xs-down">Metrics</h3>
+                <div id="metrics-accordion" role="tablist" aria-multiselectable="true">
+                    <div class="card metric-template hide">
+                        <div class="card-header" role="tab" id="headingOne">
+                            <h5 class="mb-0">
+                                <a class="metric-title" data-toggle="collapse" data-parent="#metrics-accordion"></a>
+                            </h5>
+                        </div>
+
+                        <div class="collapse metric-body" role="tabpanel">
+                            <div class="card-block">
+                                <table class="table table-striped">
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>   
+                        
+{% endblock %}

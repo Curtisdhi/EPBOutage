@@ -1,0 +1,53 @@
+version: '3.1'
+
+services:
+  php-fpm:
+    build: ./.docker/php
+    image: php:8.1-fpm-alpine
+    container_name: 'epboutage-php-fpm'
+    hostname: 'epboutage-php-fpm'
+    depends_on:
+      - mysql
+    volumes:
+      - ./app:/var/www/
+    environment:
+      DATABASE_NAME: ${DATABASE_NAME}
+      DATABASE_USER: ${DATABASE_USER}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+    networks:
+      - epboutage-LAMP 
+
+  apache:
+    image: httpd:2.4-alpine
+    container_name: 'epboutage_apache'
+    hostname: 'epboutage-apache'
+    depends_on:
+      - php-fpm
+    ports:
+      - "8090:80"
+    volumes:
+      - .docker/apache/default.conf:/usr/local/apache2/conf/default.conf
+      - .docker/apache/httpd.conf:/usr/local/apache2/conf/httpd.conf
+      - ./app/public:/var/www/public/
+    environment:
+      - PHP_ID=epboutage-php-fpm
+      - PHP_PORT=9000
+    networks:
+      - epboutage-LAMP 
+
+  mysql:
+    image: mariadb:10.5.15
+    container_name: 'epboutage_mysql'
+    hostname: 'epboutage-mysql'
+    ports:
+      - "3390:3306"
+    volumes:
+      - ./.docker/mysql/data:/var/lib/mysql
+    environment:
+      MYSQL_DATABASE: ${DATABASE_NAME}
+      MYSQL_ROOT_PASSWORD: ${DATABASE_PASSWORD}
+    networks:
+      - epboutage-LAMP 
+
+networks:
+  epboutage-LAMP:
