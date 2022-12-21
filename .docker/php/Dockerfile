@@ -14,6 +14,7 @@ RUN chmod +x /usr/local/bin/docker-entrypoint
 
 RUN apk --update --no-cache add \
   bash \
+  npm \
   acl \
   fcgi \
   file \

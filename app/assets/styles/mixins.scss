@@ -1,0 +1,22 @@
+@function color($color, $tone: 'base') {
+    @return map-get(map-get($colors, $color), $tone);
+}
+
+@mixin breakpoint($breakpoint, $direction: min) {
+    
+    //check if the supplied breakpoint exists in our breakpoits map
+    @if map-has-key($breakpoints, $breakpoint) { 
+
+        @media (min-width: map-get($breakpoints, $breakpoint)) {
+            @content;
+        }
+    
+    // use the custom value if the breakpoint is not part of the pre-defined list
+    } @else {
+
+        @media (min-width: $breakpoint) {
+            @content;
+        }
+
+    }
+}

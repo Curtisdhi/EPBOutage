@@ -1,12 +1,25 @@
-/*
- * Welcome to your app's main JavaScript file!
- *
- * We recommend including the built version of this JavaScript file
- * (and its CSS file) in your base layout (base.html.twig).
- */
+"use strict";
 
-// any CSS you import will output into a single css file (app.css in this case)
-import './styles/app.css';
+import $ from 'jquery';
 
-// start the Stimulus application
-import './bootstrap';
+import './styles/app.scss';
+import OutageMap from './OutageMap';
+
+
+
+$(document).ready(() => {
+    var map = $('#map');
+    var metricsTableElement = $('#metrics-accordion');
+    var centerCoords = map.data('center-location').split(' ');
+
+    let outageMap = new OutageMap(map, metricsTableElement, map.data('zoom'), centerCoords);
+});
+
+function initMap() {
+    let map = new google.maps.Map(document.getElementById("map"), {
+      center: { lat: -34.397, lng: 150.644 },
+      zoom: 8,
+    });
+  }
+  
+window.initMap = initMap;

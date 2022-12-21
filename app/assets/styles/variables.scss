@@ -1,0 +1,32 @@
+//$fa-font-path: "@fortawesome/fontawesome-free/webfonts";
+$navbar-height: 68px;
+
+$breakpoints: (
+    sm: 35.5em,
+    md: 48em,
+    lg: 64em,
+    xl: 80em,
+    xxl: 120em,
+);
+
+$colors: (
+    primary: (
+        base: #005199,
+        dark: #7EB8DD,
+        light: #CEE4F2,
+    ),
+    primary-dark: (
+        base: #343a40,
+    ),
+    Pantone: (
+        base: #617067,
+        5615: #617067,
+        7493: #B0BA8A,
+        9562: #CCDCC4,
+        5635: #84948A,
+    ),
+    shadow: (
+        base: #727272,
+    )
+);
+

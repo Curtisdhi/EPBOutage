@@ -1,7 +1,7 @@
 {% extends 'layout.html.twig' %}
 {% block javascript %}
     {{ parent() }}
-    <script src="https://maps.googleapis.com/maps/api/js?key={{ google_map.api_key }}"></script>
+    <script async defer src="//maps.googleapis.com/maps/api/js?key={{ google_map.api_key }}&callback=initMap&v=weekly""></script>
 {% endblock %}
 
 {% block content %}
@@ -27,7 +27,7 @@
                     </select>
                     <label class="hidden-xs-down" style="display: inline-block;">Outages for the past 24 hours</label>
                 </div>
-                <div id="map" data-zoom="{{ google_map.zoom }}" data-center-location="{{ google_map.center_location|json_encode() }}"></div>
+                <div id="map" data-zoom="{{ google_map.zoom }}" data-center-location="{{ google_map.center_location }}"></div>
             </div>
             <br>
             <div class="row">
