@@ -2,73 +2,32 @@
 
 namespace App\Services\Import;
 
-use Doctrine\Common\Persistence\ObjectManager;
-use EPBOutage\MainBundle\Document as Document;
+use Doctrine\Persistence\ManagerRegistry;
+use App\Entity\Outage;
 
 class OutageImporter extends Importer {
     
-    const IMPORTER_VERSION = '2.0.0';
+    const IMPORTER_VERSION = '3.0.0';
     
-    public function __construct(ObjectManager $objectManager) {
-        parent::__construct($objectManager);
+    public function __construct(ManagerRegistry $doctrine) {
+        parent::__construct($doctrine);
     }
     
-    public function importFromJsonString($outageJsonString) { 
-        
-    }
-    
-    public function importFromJsonApiArray($jsonApi) {
-        $this->object = new Document\Outage();
-        
+    public function importFromJson(array $json): void { 
+        $this->object = new Outage();
         $this->object->setImporterVersion(self::IMPORTER_VERSION);
         
-        $boundariesImporter = new BoundariesImporter($this->objectManager, $this->object);
-        $incidentsImporter = new IncidentsImporter($this->objectManager, $this->object);
-        $metricsImporter = new MetricsImporter($this->objectManager, $this->object);
+        $boundariesImporter = new BoundariesImporter($this->doctrine, $this->object);
+        $incidentsImporter = new IncidentsImporter($this->doctrine, $this->object);
         
-        $boundariesImporter->importFromJsonString($jsonApi['mobile_detail_boundaries']);
-        $incidentsImporter->importFromJsonString($jsonApi['mobile_detail_incidents']);
-        $metricsImporter->importFromJsonString($jsonApi['mobile_detail_restores']);
+        $boundariesImporter->importFromJsonString($json['mobile_detail_boundaries']);
+        $incidentsImporter->importFromJsonString($json['mobile_detail_incidents']);
+        $incidentsImporter->importFromJsonString($json['mobile_detail_restores']);
 
-        $currentOutages = 0;
-        $customersAffected = 0;
-        foreach ($this->object->getDistrictOutages() as $districtOutage) {
-            $currentOutages += $districtOutage->getIncidents();
-            $customersAffected += $districtOutage->getCustomersAffected();
-        }
-        
-        $this->object->getMetrics()
-            ->setCurrentOutages($currentOutages)
-            ->setCustomersAffected($customersAffected);
+        $this->object
+            ->setCurrentOutages($incidentsImporter->getTotalOutages())
+            ->setCustomersAffected($incidentsImporter->getTotalCustomersAffected());
  
-    }
-    
-    public function rebuildFromExisting($outage) {
-        $outage->setImporterVersion(self::IMPORTER_VERSION);
-        
-        $jsonApi = $outage->getFullJson();
-                
-        $boundariesImporter = new BoundariesImporter($this->objectManager, $outage);
-        $incidentsImporter = new IncidentsImporter($this->objectManager, $outage);
-        $metricsImporter = new MetricsImporter($this->objectManager, $outage);
-        
-        $boundariesImporter->importFromJsonString($jsonApi['boundaries']);
-        $incidentsImporter->importFromJsonString($jsonApi['incidents']);
-        $metricsImporter->importFromJsonString($jsonApi['metrics']);
-
-        $currentOutages = 0;
-        $customersAffected = 0;
-        foreach ($outage->getDistrictOutages() as $districtOutage) {
-            $currentOutages += $districtOutage->getIncidents();
-            $customersAffected += $districtOutage->getCustomersAffected();
-        }
-        
-        $outage->getMetrics()
-            ->setCurrentOutages($currentOutages)
-            ->setCustomersAffected($customersAffected);
-        
-        $this->objectManager->persist($outage);
-        
     }
 
 }

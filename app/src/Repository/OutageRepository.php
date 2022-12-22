@@ -5,7 +5,7 @@ namespace App\Repository;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\Query;
-use App\Outage;
+use App\Entity\Outage;
 
 
 class OutageRepository extends ServiceEntityRepository {

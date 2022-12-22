@@ -2,39 +2,54 @@
 
 namespace App\Services\Import;
 
-use Doctrine\Common\Persistence\ObjectManager;
-use EPBOutage\MainBundle\Document as Document;
+use Doctrine\Persistence\ManagerRegistry;
+use App\Entity\Outage;
+use App\Entity\Boundaries;
 
 class BoundariesImporter extends Importer {
     
-    private $outage;
+    private Outage $outage;
     
-    public function __construct(ObjectManager $objectManager, Document\Outage $outage) {
-        parent::__construct($objectManager);
+    public function __construct(ManagerRegistry $doctrine, Outage $outage) {
+        parent::__construct($doctrine);
         $this->outage = $outage;
     }
     
-    public function importFromJsonString($boundariesJsonString) {
-        $json = json_decode($boundariesJsonString, true);
-        $this->outage->setBoundaries($this->createBoundaries($json['districts']));
-        $this->outage->setFullJson('boundaries', $boundariesJsonString);
+    public function importFromJson(array $json): void {
+        $entityManager = $this->doctrine->getManager();
+
+        $hashSum = hash('sha256', $json['districts'], false);
+
+        $boundaries = $entityManager->getRepository(Boundaries::class)
+            ->findOneBy(['hashSum' => $hashSum]);
+
+        if ($boundaries === null) {
+            $this->outage->setBoundaries($this->createBoundaries($json['districts']));
+        } else {
+            $this->outage->setBoundaries($boundaries);
+        }
+
+        $this->outage->setFullJson('boundaries', $json);
     }
     
-    public function createBoundaries($boundaries) {
-        $docBoundaries = array();
+    private function createBoundaries(array $boundaries): Boundaries  {
+        $boundaries = new Boundaries();
+        
         foreach ($boundaries as $boundary) {
-            $b = new Document\Boundary();
-            $b->setName($this->getVal('boundaryName', $boundary));
+            $b = [];
+            $b['name'] = $this->getVal('boundaryName', $boundary);
+            $b['coordinates'] = [];
             foreach ($boundary['coordinates'] as $coord) {
-                $b->addLatLng(array(
-                    'lng' => $this->getVal('longitude', $coord),
-                    'lat' => $this->getVal('latitude', $coord)));
+                $b['coordinates'][] = [
+                    'longitude' => $this->getVal('longitude', $coord),
+                    'latitude' => $this->getVal('latitude', $coord),
+                ];
             }
            
-            $docBoundaries[] = $b;
+            $boundaries[] = $b;
         }
         
-        return $docBoundaries;
+        return $boundaries;
     }
     
 

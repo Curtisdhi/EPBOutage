@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use App\Repository\OutageRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Types\UuidType;
+use Symfony\Component\Uid\Uuid;
 use Gedmo\Mapping\Annotation as Gedmo;
 
 #[ORM\Entity(repositoryClass: OutageRepository::class)]
@@ -11,217 +13,215 @@ class Outage implements \JsonSerializable
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
     protected $id;
+
+    #[ORM\Column(type: UuidType::NAME, unique: true)]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
+    #[ORM\CustomIdGenerator(class: 'doctrine.uuid_generator')]
+    private $uuid;
+
+    #[Gedmo\Timestampable(on: 'update')]
+    #[ORM\Column(type: 'date_immutable')]
+    protected $updatedOn;  
+    
+    #[Gedmo\Timestampable(on: 'create')]
+    #[ORM\Column(type: 'date_immutable')]
+    protected $createdOn;  
     
     #[ORM\Column(type: 'string')]
     protected $importerVersion;
     
-    /** @Mongo\Field(type="integer") */
+    #[ORM\Column(type: 'integer')]
     protected $autoRestoredOutages;
         
-    /** @Mongo\Field(type="integer") */
+    #[ORM\Column(type: 'integer')]
     protected $currentOutages;
 
-    /** @Mongo\Field(type="integer") */
+    #[ORM\Column(type: 'integer')]
     protected $customersAffected;
 
-    /** @Mongo\Field(type="integer") */
+    #[ORM\Column(type: 'integer')]
     protected $crewDispatched;
             
-    /** @Mongo\Field(type="integer") */
+    #[ORM\Column(type: 'integer')]
     protected $durationOutages;
 
-    /** @Mongo\Field(type="integer") */
+    #[ORM\Column(type: 'integer')]
     protected $preventedOutages;
 
-    /** @Mongo\Field(type="integer") */
+    #[ORM\Column(type: 'integer')]
     protected $totalSmartGridActivity;
 
-    /** @Mongo\Field(type="integer") */
+    #[ORM\Column(type: 'integer')]
     protected $smartGridRestores;
 
-    /** @Mongo\Field(type="integer") */
+    #[ORM\Column(type: 'integer')]
     protected $manualRestores;
             
-    /** @Mongo\Field(type="integer") */
-    protected $beginDtTm;
+    #[ORM\Column(type: 'date_immutable')]
+    protected $startDatetime;
 
-    /** @Mongo\Field(type="integer") */
-    protected $endDtTm;    
+    #[ORM\Column(type: 'date_immutable')]
+    protected $endDateTime;    
+    
+    #[ORM\ManyToOne(targetEntity: Boundaries::class)]
+    protected $boundaries;
 
-    /** @Mongo\EmbedMany(targetDocument="EPBOutage\MainBundle\Document\Dispatch") */
-    protected $dispatches = array();
-    
-    /** @Mongo\EmbedMany(targetDocument="EPBOutage\MainBundle\Document\DistrictOutage") */
-    protected $districtOutages = array();
-    
-    /** @Mongo\EmbedMany(targetDocument="EPBOutage\MainBundle\Document\Boundary") */
-    protected $boundaries = array();
-    
-     /**
-     * @var datetime $updated
-     *
-     * @Gedmo\Timestampable(on="update")
-     * @Mongo\Field(type="date")
-     */
-    protected $updatedOn;  
-    
-    /**
-     * @var datetime $updated
-     *
-     * @Gedmo\Timestampable(on="create")
-     * @Mongo\Field(type="date")
-     */
-    protected $createdOn;  
-    
-    /** @Mongo\Field(type="hash") */
-    protected $fullJson = array();
+    #[ORM\Column(type: 'json')]
+    protected $incidents;
+
+    #[ORM\Column(type: 'json')]
+    protected $districtIncidents;
+
+    #[ORM\Column(type: 'json')]
+    protected $fullJson;
 
     public function __construct() {
-        
-    }
-    
-    function getImporterVersion() {
-        return $this->importerVersion;
+        $this->incidents = [];
+        $this->districtIncidents = [];
+        $this->fullJson = [];
     }
 
-    function setImporterVersion($importerVersion) {
-        $this->importerVersion = $importerVersion;
-    }
-
-    public function getId() {
+    public function getId(): int {
         return $this->id;
     }
 
-    public function getAutoRestoredOutages() {
+    public function getUuid(): Uuid {
+        return $this->uuid;
+    }
+
+    public function getUpdatedOn(): \DateTimeImmutable {
+        return $this->updatedOn;
+    }
+
+    public function setUpdated(\DateTimeImmutable $updatedOn): self {
+        $this->updatedOn = $updatedOn;
+        return $this;
+    }
+    
+    public function getCreatedOn(): \DateTimeImmutable {
+        return $this->createdOn;
+    }
+
+    public function setCreatedOn(\DateTimeImmutable $createdOn): self {
+        $this->createdOn = $createdOn;
+        return $this;
+    }
+
+    function getImporterVersion(): string {
+        return $this->importerVersion;
+    }
+
+    function setImporterVersion($importerVersion): self {
+        $this->importerVersion = $importerVersion;
+        return $this;
+    }
+
+    public function getAutoRestoredOutages(): int {
         return $this->autoRestoredOutages;
     }
-
-    public function getCurrentOutages() {
-        return $this->currentOutages;
-    }
-
-    public function getDurationOutages() {
-        return $this->durationOutages;
-    }
-
-    public function getPreventedOutages() {
-        return $this->preventedOutages;
-    }
     
-    function getSmartGridRestores() {
-        return $this->smartGridRestores;
-    }
-    
-    function getManualRestores() {
-        return $this->manualRestores;
-    }
-    
-    public function getTotalSmartGridActivity() {
-        return $this->totalSmartGridActivity;
-    }
-
-    public function getBeginDtTm() {
-        return $this->beginDtTm;
-    }
-
-    public function getEndDtTm() {
-        return $this->endDtTm;
-    }
-
-    public function setAutoRestoredOutages($autoRestoredOutages) {
+    public function setAutoRestoredOutages($autoRestoredOutages): self {
         $this->autoRestoredOutages = $autoRestoredOutages;
         return $this;
     }
 
-    public function setCurrentOutages($currentOutages) {
+    public function getCurrentOutages(): int {
+        return $this->currentOutages;
+    }
+
+    public function setCurrentOutages($currentOutages): self {
         $this->currentOutages = $currentOutages;
         return $this;
     }
 
-    public function setDurationOutages($durationOutages) {
+    public function getDurationOutages(): int {
+        return $this->durationOutages;
+    }
+
+    public function setDurationOutages($durationOutages): self {
         $this->durationOutages = $durationOutages;
         return $this;
     }
 
-    public function setPreventedOutages($preventedOutages) {
+    public function getPreventedOutages(): int {
+        return $this->preventedOutages;
+    }
+    
+    public function setPreventedOutages($preventedOutages): self {
         $this->preventedOutages = $preventedOutages;
         return $this;
     }
-
-    function setSmartGridRestores($smartGridRestores) {
+    
+    function getSmartGridRestores(): int {
+        return $this->smartGridRestores;
+    }
+    
+    function setSmartGridRestores($smartGridRestores): self {
         $this->smartGridRestores = $smartGridRestores;
+        return $this;
     }
 
-    function setManualRestores($manualRestores) {
+    function getManualRestores(): int {
+        return $this->manualRestores;
+    }
+
+    function setManualRestores($manualRestores): self {
         $this->manualRestores = $manualRestores;
+        return $this;
     }
 
-    public function setTotalSmartGridActivity($totalSmartGridActivity) {
+    public function getTotalSmartGridActivity(): int {
+        return $this->totalSmartGridActivity;
+    }
+
+    public function setTotalSmartGridActivity($totalSmartGridActivity): self {
         $this->totalSmartGridActivity = $totalSmartGridActivity;
         return $this;
     }
 
-    public function setBeginDtTm($beginDtTm) {
-        $this->beginDtTm = $beginDtTm;
+    public function setStartDatetime($startDatetime): self {
+        $this->startDatetime = $startDatetime;
         return $this;
     }
 
-    public function setEndDtTm($endDtTm) {
-        $this->endDtTm = $endDtTm;
+    public function getStartDatetime(): \DateTimeImmutable {
+        return $this->startDatetime;
+    }
+
+    public function setEndDate($endDateTime): self {
+        $this->endDateTime = $endDateTime;
         return $this;
     }
+
+    public function getEndDatetime(): \DateTimeImmutable {
+        return $this->endDateTime;
+    }
     
-    function getCustomersAffected() {
+    public function getCustomersAffected(): int {
         return $this->customersAffected;
     }
 
-    function setCustomersAffected($customersAffected) {
+    public function setCustomersAffected(int $customersAffected): self {
         $this->customersAffected = $customersAffected;
+        return $this;
     }
     
-    function getCrewDispatched() {
+    public function getCrewDispatched(): int {
         return $this->crewDispatched;
     }
 
-    function setCrewDispatched($crewDispatched) {
+    public function setCrewDispatched(int $crewDispatched): self {
         $this->crewDispatched = $crewDispatched;
-    }
-
-    public function getDispatches() {
-        return $this->dispatches;
-    }
-    
-    public function getDistrictOutages() {
-        return $this->districtOutages;
-    }
-
-    public function setId($id) {
-        $this->id = $id;
-        return $this;
-    }
-
-    public function setMetrics($metrics) {
-        $this->metrics = $metrics;
-        return $this;
-    }
-
-    public function setDispatches($dispatches) {
-        $this->dispatches = $dispatches;
-        return $this;
-    }
-
-    public function setDistrictOutages($districtOutages) {
-        $this->districtOutages = $districtOutages;
         return $this;
     }
     
-    public function getFullJson() {
+    public function getFullJson(): array {
         return $this->fullJson;
     }
 
-    public function setFullJson($key, $fullJson) {
+    public function setFullJson($key, $fullJson): self {
         if ($key === null) {
             $this->fullJson = $fullJson;
         } else {
@@ -230,51 +230,18 @@ class Outage implements \JsonSerializable
         return $this;
     }
 
-    public function getBoundaries() {
+    public function getBoundaries(): ?Boundaries {
         return $this->boundaries;
     }
 
-    public function setBoundaries($boundaries) {
+    public function setBoundaries(?Boundaries $boundaries): self {
         $this->boundaries = $boundaries;
         return $this;
     }
     
-    public function getUpdatedOn() {
-        return $this->updatedOn;
-    }
-
-    public function setUpdated(\Datetime $updatedOn) {
-        $this->updatedOn = $updatedOn;
-        return $this;
-    }
-    
-    function getCreatedOn() {
-        return $this->createdOn;
-    }
-
-    function setCreatedOn(\Datetime $createdOn) {
-        $this->createdOn = $createdOn;
-    }
-
-    public function jsonSerialize() {
-        
-        $dispatches = array();
-        $districtOutages = array();
-        $boundaries = array();
-        foreach ($this->getDispatches() as $dispatch) {
-            $dispatches[] = $dispatch->jsonSerialize();
-        }
-        
-        foreach ($this->getDistrictOutages() as $districtOutage) {
-            $districtOutages[] = $districtOutage->jsonSerialize();
-        }
-        
-        foreach ($this->getBoundaries() as $boundary) {
-            $boundaries[] = $boundary->jsonSerialize();
-        }
-        
-        return array(
-            'id' => $this->getId(),
+    public function jsonSerialize(): mixed {
+        return [
+            'id' => $this->getUuid(),
             'metrics' => [
                 'autoRestoredOutages' => $this->getAutoRestoredOutages(),
                 'currentOutages' => $this->getCurrentOutages(),
@@ -285,13 +252,13 @@ class Outage implements \JsonSerializable
                 'smartGridRestores' => $this->getSmartGridRestores(),
                 'manualRestores' => $this->getManualRestores(),
                 'totalSmartGridActivity' => $this->getTotalSmartGridActivity(),
-                'beginDtTm' => $this->getBeginDtTm(),
-                'endDtTm' => $this->getEndDtTm(),
+                'startDatetime' => $this->getStartDatetime(),
+                'endDatetime' => $this->getEndDatetime(),
             ],
-            'dispatches' => $dispatches,
-            'districtOutages' => $districtOutages,
-            'boundaries' => $boundaries,
-        );
+            'incidents' => $this->incidents,
+            'districtIncidents' => $this->districtIncidents,
+            'boundaries' => $this->boundaries->getBoundariesJson(),
+        ];
     }
 
 }
