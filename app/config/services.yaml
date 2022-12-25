@@ -4,7 +4,10 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
-
+    app.api_boundaries_url: '%env(MOBILE_DETAIL_BOUNDARIES)%'
+    app.api_incidents_url:
+        restores: '%env(MOBILE_DETAIL_RESTORES)%'
+        incidents: '%env(MOBILE_DETAIL_INCIDENTS)%'
 services:
     # default configuration for services in *this* file
     _defaults:
@@ -22,3 +25,8 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+
+    App\Command\FetchOutagesCommand:
+        arguments:
+            $apiBoundariesUrl: '%app.api_boundaries_url%'
+            $apiIncidentUrls: '%app.api_incidents_url%'

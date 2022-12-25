@@ -14,4 +14,12 @@ class BoundariesRepository extends ServiceEntityRepository {
         parent::__construct($registry, Boundaries::class);
     }
 
+    public function findLatest() {
+        $qb = $this->createQueryBuilder('b')
+            ->orderBy('b.createdOn', 'desc')
+            ->setMaxResults(1);
+        
+        return $qb->getQuery()->getOneOrNullResult();
+    }
+
 }

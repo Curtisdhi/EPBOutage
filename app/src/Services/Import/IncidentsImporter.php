@@ -9,9 +9,6 @@ class IncidentsImporter extends Importer {
     
     private Outage $outage;
 
-    private int $totalOutages;
-    private int $totalCustomersAffected;
-    
     public function __construct(ManagerRegistry $doctrine, Outage $outage) {
         parent::__construct($doctrine);
         $this->outage = $outage;
@@ -21,7 +18,7 @@ class IncidentsImporter extends Importer {
         ];
     }
     
-    public function importFromJson(array $json): void {
+    public function importFromJson(mixed $json): void {
         if (isset($json['incidents'])) {
             $this->createIncidents($json['incidents']);
         }
@@ -30,15 +27,18 @@ class IncidentsImporter extends Importer {
         }
         if (isset($json['restores'])) {
             $this->createIncidents($json['restores']);
+            $this->outage->setStartDatetime(new \DateTimeImmutable($this->getVal('startDate', $json)));
+            $this->outage->setEndDate(new \DateTimeImmutable($this->getVal('endDate', $json)));
         }
         if (isset($json['districts'])) {
             $this->createDistrictIncidents($json['districts']);
         }
 
-        $this->outage->setFullJson('incidents', array_merge($this->outage->getFullJson()['incidents'], $json));
+        $fullJson = isset($this->outage->getFullJson()['incidents']) ? $this->outage->getFullJson()['incidents'] : [];
+        $this->outage->setFullJson('incidents', array_merge($fullJson, $json));
     }
     
-    private function createIncidents(array $incidents): void {
+    private function createIncidents(mixed $incidents): void {
         $inc = [];
         foreach ($incidents as $incident) {
             $inc['crewQty'] = $this->getVal('crewQty', $incident);
@@ -51,10 +51,17 @@ class IncidentsImporter extends Importer {
             switch ($inc['incidentStatus']) {
                 case 'OUTAGE_REPORTED':
                 case 'REPAIR_IN_PROGRESS':
-                    $this->totalOutages++;
-                    $this->totalCustomersAffected += $inc['customerQty'];
+                    $this->outage->setCurrentOutages($this->outage->getCurrentOutages() + 1);
+                    $this->outage->setCustomersAffected($this->outage->getCustomersAffected() + $inc['customerQty']);
+                break;
+                case 'SMART_GRID_RESTORE':
+                    $this->outage->setAutoRestoredOutages($this->outage->getAutoRestoredOutages() + 1);
+
                 break;
             }
+
+            $this->outage->setCrewDispatched($this->outage->getCrewDispatched() + $inc['crewQty']);
+            
         }
     }
     
@@ -62,23 +69,36 @@ class IncidentsImporter extends Importer {
         $dis = [];
        
         foreach ($districtIncidents as $districtIncident) {
+            $name = null;
+            $status = null;
+            $incidentQty = 0;
+            $customerQty = 0;
+
             foreach ($districtIncident as $key => $v) {
+                $this->object['districtIncidents'][$key] = [];
                 if ($key === 'district') {
-                    $this->object['districtIncidents']['name'] = $this->getVal('district', $districtOutage);
+                    $name = $this->getVal('district', $districtIncident);
                 } else {
-                    $this->object['districtIncidents']['name'][$key]['incidentQty'] += $this->getVal('incidentQty', $v);
-                    $this->object['districtIncidents']['name'][$key]['customerQty'] += $this->getVal('customerQty', $v);
+                    $status = $key;
+                    $incidentQty = $this->getVal('incidentQty', $v);
+                    $customerQty = $this->getVal('customerQty', $v);
                 }
             }
+
+            if (!isset($this->object['districtIncidents'][$name])) {
+                $this->object['districtIncidents'][$name] = [];
+            }
+            if (!isset($this->object['districtIncidents'][$name][$status])) {
+                $this->object['districtIncidents'][$name][$status] = [
+                    'incidentQty' => 0,
+                    'customerQty' => 0,
+                ];
+            }
+            $this->object['districtIncidents'][$name][$status]['incidentQty'] += $incidentQty;
+            $this->object['districtIncidents'][$name][$status]['customerQty'] += $customerQty;
+
         }
-    }
-    
-    public function getTotalOutages(): int {
-        return $this->totalOutages;
+
     }
 
-    public function getTotalCustomersAffected(): int {
-        return $this->totalCustomersAffected;
-    }
-    
 }

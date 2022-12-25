@@ -7,35 +7,31 @@ use App\Entity\Outage;
 use App\Entity\Boundaries;
 
 class BoundariesImporter extends Importer {
-    
-    private Outage $outage;
-    
-    public function __construct(ManagerRegistry $doctrine, Outage $outage) {
+
+    public function __construct(ManagerRegistry $doctrine) {
         parent::__construct($doctrine);
-        $this->outage = $outage;
     }
     
-    public function importFromJson(array $json): void {
+    public function importFromJson(mixed $json): void {
         $entityManager = $this->doctrine->getManager();
 
-        $hashSum = hash('sha256', $json['districts'], false);
+        $hashSum = hash('sha256', serialize($json['districts']), false);
 
-        $boundaries = $entityManager->getRepository(Boundaries::class)
+        $this->object = $entityManager->getRepository(Boundaries::class)
             ->findOneBy(['hashSum' => $hashSum]);
 
-        if ($boundaries === null) {
-            $this->outage->setBoundaries($this->createBoundaries($json['districts']));
-        } else {
-            $this->outage->setBoundaries($boundaries);
+        if ($this->object === null) {
+            $this->object = $this->createBoundaries($json['districts']);
+            $this->object->setHashSum($hashSum);
         }
 
-        $this->outage->setFullJson('boundaries', $json);
     }
     
-    private function createBoundaries(array $boundaries): Boundaries  {
+    private function createBoundaries(mixed $jsonBoundaries): Boundaries  {
         $boundaries = new Boundaries();
         
-        foreach ($boundaries as $boundary) {
+        $newJsonBoundaries = [];
+        foreach ($jsonBoundaries as $boundary) {
             $b = [];
             $b['name'] = $this->getVal('boundaryName', $boundary);
             $b['coordinates'] = [];
@@ -46,11 +42,12 @@ class BoundariesImporter extends Importer {
                 ];
             }
            
-            $boundaries[] = $b;
+            $newJsonBoundaries[] = $b;
         }
+        
+        $boundaries->setBoundariesJson($newJsonBoundaries);
         
         return $boundaries;
     }
     
-
 }

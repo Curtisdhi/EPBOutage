@@ -6,63 +6,55 @@ use App\Repository\OutageRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Uid\Uuid;
-use Gedmo\Mapping\Annotation as Gedmo;
 
 #[ORM\Entity(repositoryClass: OutageRepository::class)]
 class Outage implements \JsonSerializable
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\Column(type: 'bigint', options: ['unsigned' => true])]
     protected $id;
 
     #[ORM\Column(type: UuidType::NAME, unique: true)]
-    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
-    #[ORM\CustomIdGenerator(class: 'doctrine.uuid_generator')]
     private $uuid;
-
-    #[Gedmo\Timestampable(on: 'update')]
-    #[ORM\Column(type: 'date_immutable')]
-    protected $updatedOn;  
     
-    #[Gedmo\Timestampable(on: 'create')]
-    #[ORM\Column(type: 'date_immutable')]
+    #[ORM\Column(type: 'datetime_immutable')]
     protected $createdOn;  
     
     #[ORM\Column(type: 'string')]
     protected $importerVersion;
     
     #[ORM\Column(type: 'integer')]
-    protected $autoRestoredOutages;
+    protected $autoRestoredOutages = 0;
         
     #[ORM\Column(type: 'integer')]
-    protected $currentOutages;
+    protected $currentOutages = 0;
 
     #[ORM\Column(type: 'integer')]
-    protected $customersAffected;
+    protected $customersAffected = 0;
 
     #[ORM\Column(type: 'integer')]
-    protected $crewDispatched;
+    protected $crewDispatched = 0;
             
     #[ORM\Column(type: 'integer')]
-    protected $durationOutages;
+    protected $durationOutages = 0;
 
     #[ORM\Column(type: 'integer')]
-    protected $preventedOutages;
+    protected $preventedOutages = 0;
 
     #[ORM\Column(type: 'integer')]
-    protected $totalSmartGridActivity;
+    protected $totalSmartGridActivity = 0;
 
     #[ORM\Column(type: 'integer')]
-    protected $smartGridRestores;
+    protected $smartGridRestores = 0;
 
     #[ORM\Column(type: 'integer')]
-    protected $manualRestores;
+    protected $manualRestores = 0;
             
-    #[ORM\Column(type: 'date_immutable')]
+    #[ORM\Column(type: 'datetime_immutable')]
     protected $startDatetime;
 
-    #[ORM\Column(type: 'date_immutable')]
+    #[ORM\Column(type: 'datetime_immutable')]
     protected $endDateTime;    
     
     #[ORM\ManyToOne(targetEntity: Boundaries::class)]
@@ -78,6 +70,8 @@ class Outage implements \JsonSerializable
     protected $fullJson;
 
     public function __construct() {
+        $this->uuid = Uuid::v7();
+        $this->setCreatedOn(new \DateTimeImmutable());
         $this->incidents = [];
         $this->districtIncidents = [];
         $this->fullJson = [];
@@ -89,15 +83,6 @@ class Outage implements \JsonSerializable
 
     public function getUuid(): Uuid {
         return $this->uuid;
-    }
-
-    public function getUpdatedOn(): \DateTimeImmutable {
-        return $this->updatedOn;
-    }
-
-    public function setUpdated(\DateTimeImmutable $updatedOn): self {
-        $this->updatedOn = $updatedOn;
-        return $this;
     }
     
     public function getCreatedOn(): \DateTimeImmutable {

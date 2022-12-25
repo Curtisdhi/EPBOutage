@@ -17,11 +17,15 @@ abstract class Importer {
         return $this->object;
     }
     
-    public abstract function importFromJson(array $json): void;
+    public abstract function importFromJson(mixed $json): void;
     
-    public function flush(): void {
+    public function persist(): void {
         $this->doctrine->getManager()->persist($this->object);
-        $this->objectManager->getManager()->flush();
+    }
+
+    public function flush(): void {
+        $this->persist();
+        $this->doctrine->getManager()->flush();
     }
 
     protected function getVal($key, $d): mixed {
